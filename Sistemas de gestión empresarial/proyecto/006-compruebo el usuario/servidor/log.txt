@@ -1,22 +1,22 @@
 
 		SELECT * FROM usuarios 
 		WHERE usuario = '' 
-		AND contrasena = ''
+		AND password = ''
 	
 
 
 		SELECT * FROM usuarios 
 		WHERE usuario = '' 
-		AND contrasena = ''
+		AND password = ''
 	
 
 
 		SELECT * FROM usuarios 
 		WHERE usuario = '' 
-		AND contrasena = ''
+		AND password = ''
 	
 
 		SELECT * FROM usuarios 
 		WHERE usuario = '' 
-		AND contrasena = ''
+		AND password = ''
 	

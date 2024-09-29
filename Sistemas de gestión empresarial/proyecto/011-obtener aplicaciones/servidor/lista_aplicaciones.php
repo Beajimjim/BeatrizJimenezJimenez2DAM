@@ -1,7 +1,7 @@
 <?php
 
 	mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);			// Establezco el nivel de retorno de errores de PHP
-	$mysqli = mysqli_connect("localhost", "crimson", "crimson", "crimson");		// Me conecto a la base de datos
+	$mysqli = mysqli_connect("localhost", "appsge", "appsge", "sistemagestionempresa");		// Me conecto a la base de datos
 	$query = "
 		SELECT 
 			nombre,

@@ -1,7 +1,4 @@
-html,body{
-  padding:50px;
-  margin:0px;
-}
+
 main {
 box-sizing:border-box;
     padding:20px;
@@ -26,8 +23,22 @@ box-sizing:border-box;
       background-position: center;
       opacity: 0.3;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      background: rgb(100, 100, 100);
+      background: #faa916;
       position: relative;
       cursor: pointer;
       border-radius:5px;
+  }
+
+  .header_logout{
+      display: flex;
+      justify-content: end;
+  }
+
+  .header_text{
+      text-align: center;
+  }
+
+  .main_application_icon{
+      width: 20%;
+      height: 40%;
   }
