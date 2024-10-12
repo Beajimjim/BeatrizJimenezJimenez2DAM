@@ -12,7 +12,7 @@
       trabajador.postMessage("hola");                 // Le envío un mensaje 
       trabajador.onmessage = function(e){
         console.log("El worker me ha devuelto un mensaje")
-        console.log("Y el worker dice:",e.data)
+        console.log("Y el worker dice:",e.data) //detecto que dice ese mensaje, es decir enviamos informacion
       }
       
       
@@ -20,3 +20,6 @@
     </script>
   </body>
 </html>
+
+
+<!-- no hacemos esto para no sobre cargar la cpu, sino para sacarle el maximo provecho a la capacidad que tengo -->

@@ -7,8 +7,8 @@
       console.log(navegador);             // Lo saco por consola
       const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
       console.log("Tu ordenador tiene",nucleos,"núcleos")
-      let trabajadores = [];                          // Creo un array
-      let numerotrabajadores = 12;                    // Especifico cuantos workers quiero
+      let trabajadores = [];                          // Creo un array Puedo tener varios worker segun el numero de nucleos
+      let numerotrabajadores = 4;                    // Especifico cuantos workers quiero
       for(let w = 0;w<numerotrabajadores;w++){        // Creo un for para crear tantos trabajadores como necesite
         trabajadores[w] = new Worker("007-worker.js");   // Creo una instancia de Worker
         trabajadores[w].postMessage("hola");                 // Le envío un mensaje 
@@ -18,7 +18,7 @@
         }
       }
       
-      
+      //he creado un array de trabajadores y a cada uno le meto un worker. No se van a ejecutar en orden sino simultaneos
       
       
     </script>

@@ -1,0 +1,16 @@
+INSERT INTO `sistemagestionempresa`.`clientes` 
+(`identificador`,`nombre`, `apellidos`, `email`, `direccion`, `cp`, `poblacion`, `pais`) 
+VALUES
+('Juan', 'Pérez García', 'juan.perez@gmail.com', 'Calle Mayor 10', '28001', 'Madrid', 'España'),
+('Laura', 'Martínez López', 'laura.martinez@hotmail.com', 'Avenida de la Paz 45', '29005', 'Málaga', 'España'),
+('Carlos', 'Hernández Soto', 'carlos.hernandez@yahoo.com', 'Calle del Sol 32', '08002', 'Barcelona', 'España'),
+('Ana', 'Fernández Ruiz', 'ana.fernandez@outlook.com', 'Calle de la Luna 12', '28012', 'Madrid', 'España'),
+('Marta', 'González Pérez', 'marta.gonzalez@gmail.com', 'Paseo de Gracia 22', '46007', 'Valencia', 'España'),
+('Pedro', 'García Ramírez', 'pedro.garcia@gmail.com', 'Calle Real 5', '41001', 'Sevilla', 'España'),
+('Sofía', 'López Sánchez', 'sofia.lopez@yahoo.com', 'Avenida América 20', '28028', 'Madrid', 'España'),
+('David', 'Rodríguez Muñoz', 'david.rodriguez@hotmail.com', 'Calle Colón 55', '03001', 'Alicante', 'España'),
+('Lucía', 'Jiménez Morales', 'lucia.jimenez@outlook.com', 'Calle Serrano 75', '28006', 'Madrid', 'España'),
+('José', 'Ruiz Ortega', 'jose.ruiz@gmail.com', 'Plaza del Pilar 15', '50001', 'Zaragoza', 'España');
+
+
+INSERT INTO `sistemagestionempresa`.`clientes` (`Identificador`, `nombre`, `apellidos`, `email`, `direccion`, `cp`, `poblacion`, `pais`) VALUES ('1', 'fsdfads', 'fasdfasdf', 'fasdfa', 'fasdfasdf', 'fasdfasd', 'fasdfasd', 'fasdfasdf');

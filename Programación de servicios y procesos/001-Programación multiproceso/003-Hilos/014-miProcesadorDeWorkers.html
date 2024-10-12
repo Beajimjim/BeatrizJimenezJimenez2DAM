@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <body>
+    <!-- Selección de efectos para aplicar a la imagen -->
+    <select id="efecto">
+        <option value="negativo">Poner en negativo</option>
+        <option value="sepia">Poner en sepia</option>       
+    </select>
+    
+    <!-- Selección del tamaño del bucket para procesar la imagen -->
+    <select id="tamanio">
+        <option value="4">4</option>
+        <option value="8">8</option>
+        <option value="16">16</option>
+        <option value="32">32</option>
+        <option value="64">64</option>
+        <option value="128">128</option>
+        <option value="256">256</option>
+    </select>
+    
+    <button id="comenzar">Comenzar</button> <!-- Botón para iniciar el procesamiento -->
+    <canvas id="lienzo1">hola</canvas> <!-- Lienzo donde se dibujará la imagen -->
+    
+    <script>
+        // Declaración de variables globales
+        var x; // Coordenada X para el procesamiento de la imagen
+        var y; // Coordenada Y para el procesamiento de la imagen
+        var bucket; // Tamaño del bloque a procesar
+        var efecto; // Efecto a aplicar a la imagen
+        
+        // Configuración del lienzo
+        const lienzo = document.querySelector("#lienzo1");
+        lienzo.width = 2373; // Ancho del lienzo
+        lienzo.height = 2048; // Alto del lienzo
+        const contexto = lienzo.getContext("2d"); // Contexto 2D para dibujar en el lienzo
+        
+        // Carga de la imagen
+        var imagen = new Image(); 
+        imagen.src = "foto1.jpg"; // Ruta de la imagen a cargar
+        imagen.onload = function() { // Cuando la imagen se carga
+            contexto.drawImage(imagen, 0, 0); // Dibuja la imagen en el lienzo
+            
+            // Inicializa las coordenadas
+            x = 0; 
+            y = 0; 
+        }
+        
+        // Función al hacer clic en el botón "Comenzar"
+        document.getElementById("comenzar").onclick = function() {
+            efecto = document.getElementById("efecto").value; // Obtiene el efecto seleccionado
+            bucket = parseInt(document.getElementById("tamanio").value); // Obtiene el tamaño del bucket seleccionado
+            trabajaMucho(); // Llama a la función para comenzar el procesamiento
+        }
+
+        // Función para procesar la imagen en bloques
+        function trabajaMucho() {
+            // Obtiene los datos del bloque de la imagen
+            datos1 = contexto.getImageData(x, y, bucket, bucket); 
+            var trabajador = new Worker("014-miProcesadorDeWorkers.js"); // Crea una nueva instancia del Worker
+            
+            // Envía los datos y el efecto al Worker
+            trabajador.postMessage({ datos: datos1.data, efecto: efecto });
+            
+            // Al recibir el mensaje de vuelta del Worker
+            trabajador.onmessage = function(misdatos) {
+                // Actualiza los datos del bloque de la imagen con los datos procesados
+                for (let i = 0; i < datos1.data.length; i++) {
+                    datos1.data[i] = misdatos.data[i]; // Actualiza el array de datos
+                }
+                contexto.putImageData(datos1,x-bucket,y) // Dibuja el bloque procesado en el lienzo
+            }
+            
+            // Actualiza las coordenadas para el siguiente bloque
+            x += bucket; 
+            if (x >= 2373) { // Si la coordenada X excede el ancho del lienzo
+                x = 0; // Reinicia X
+                y += bucket; // Avanza a la siguiente fila
+            }
+            
+            // Si aún hay bloques por procesar
+            if (x < 2373 && y < 2048) { 
+                setTimeout(function() { // Espera un momento para evitar que la ejecución se cuelgue
+                    trabajaMucho(); // Llama de nuevo a la función
+                }, 100); // Espera 100 milisegundos
+            }
+        }
+    </script>
+  </body>
+</html>

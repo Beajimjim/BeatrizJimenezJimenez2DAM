@@ -1,7 +1,0 @@
-f) Se han verificado las configuraciones del sistema operativo y del gestor de datos para garantizar la funcionalidad del ERP-CRM
-
-Actualmente, para nuestra aplicación, estamos desarrollando un ERP que nos permita hacer la gestión de una empresa. 
-Hasta ahora, se ha desarrollado el login y panel de control. Dentro de este se ha creado un menú de acceso a diferentes tablas de nuestra app.
-Para el manejo de todos los datos que se han incluido hasta ahora, se está usando XAMPP como servidor local y gestor de base de datos. Esto nos permite desarrollar en un entorno seguro.
-No obstante, si nuestra aplicación es una aplicación web, no podemos dejar el servidor como un local host, ya que no puede accederse a el a través de la red, solo desde nuestro pc.
-Asi que tendremos que subir nuestra base de datos a un servidor web que si permita el acceso mediante una url en el navegador a través de internet.

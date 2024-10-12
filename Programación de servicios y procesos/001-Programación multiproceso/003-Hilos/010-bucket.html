@@ -7,11 +7,11 @@
        var y;
        var bucket;
         const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 1024                                     // Le pongo 1024 pixeles de anchura
-        lienzo.height = 1024                                    // Le pongo 1024 pixeles de altura
+        lienzo.width = 2373
+        lienzo.height = 2048                                    // Le pongo 1024 pixeles de altura
         const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
         var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "imagenoriginal.jpg";                                // Le pongo una imagen real
+        imagen.src = "foto1.jpg";                                // Le pongo una imagen real
         imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
           contexto.drawImage(imagen,0,0)                        // Pinto la imagen
           

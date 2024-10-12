@@ -14,14 +14,14 @@
         /*/////////////////////////////// DECLARACIÓN DE LIENZO Y PROPIEDADES INICIALES DE IMAGEN ////////////////////////////////////*/
         
         const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 1024                                     // Le pongo 1024 pixeles de anchura
-        lienzo.height = 1024                                    // Le pongo 1024 pixeles de altura
+        lienzo.width = 2373
+        lienzo.height = 2048                                      // Le pongo 1024 pixeles de altura
         const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
         var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "imagenoriginal.jpg";                                // Le pongo una imagen real
+        imagen.src = "foto1.jpg";                                // Le pongo una imagen real
         imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
           contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          bucket = 128                                          // Establezco la anchura inicial del bucket
+          bucket = 200                                          // Establezco la anchura inicial del bucket
           x = 0;                                                // Inicialmente la X es 0
           y = 0;                                                // inicialmente la y es 0
           trabajaMucho()                                        // Llamo a una primera ejecución de la funcion
@@ -43,14 +43,14 @@
             contexto.putImageData(datos1,x-bucket,y)            // Esa imagen que he construido con los datos que me da el worker, pues la pongo en el canvas         
            }
            x+=bucket;                                           // Una vez que he calculado, paso al cuadro siguiente aumentando la x
-           if(x > 1024){                                        // en el caso de que la x llegue al final
+           if(x > 2048){                                        // en el caso de que la x llegue al final
             x = 0;                                              // Devuelvo la x a cero, lo que quiere decir que vuelvo a empezar por la izquierda
             y += bucket                                         // Pero bajo a la fila de bajo
            }
-           if(x < 1100 && y < 1100){                            // Si ya he llegado al final en x y en Y
+           if(x < 2373 && y < 2048){                            // Si ya he llegado al final en x y en Y
              setTimeout(function(){                             // Espera un momento porque si no la ejecucion se cuelga
                  trabajaMucho()                                 // Haz una llamada recursiva a esta misma funcion
-             },100)                                             // Dentro de X milisegundos
+             },50)                                             // Dentro de X milisegundos
            }
           
         }

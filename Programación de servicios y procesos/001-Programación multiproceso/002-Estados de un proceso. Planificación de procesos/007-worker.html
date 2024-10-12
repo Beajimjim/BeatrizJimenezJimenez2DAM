@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+  <body>
+    <canvas id="lienzo1">hola</canvas>    
+    <button id="activarWorker">Aplicar Negativo</button>
+    <button id="activarSepia">Aplicar Sepia</button>
+    <script>
+        const tiempoinicio = new Date()
+        const epochinicio = tiempoinicio.getTime()
+        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
+        lienzo.width = 2373
+        lienzo.height = 2048                                   // Le pongo 4000 pixeles de altura
+        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
+        var imagen = new Image()                                // Creo una nueva imagen
+        imagen.src = "foto1.JPG";                                // Le pongo una imagen real
+        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
+          contexto.drawImage(imagen,0,0)   
+         
+         //////////////////////////CREAMOS DOS FUNCIONES PARA QUE EL WORKER SE EJECUTE CON UN BOTON Y NOS OFREZCA DOS EFECTOS DISTINTOS///////////////////////////
+
+
+          document.getElementById("activarWorker").onclick = function() {                   // Pinto la imagen
+          var datosNegativo = contexto.getImageData(0,0,lienzo.width,lienzo.height)         // Leo los datos a la memoria
+          var trabajador = new Worker("calculosAWorker.js");
+          trabajador.postMessage({ data: datosNegativo.data, effect: 'negative' });         // Envio los datos y el efecto. En este caso lo cambiamos a negativo
+
+          trabajador.onmessage = function(misdatos){
+            for(let i = 0;i<datosNegativo.data.length;i++){
+              datosNegativo.data[i] = misdatos.data[i]
+            }
+            //console.log(datos.data)
+            contexto.putImageData(datosNegativo,0,0)                                          // Pego los datos en una imagen en el canvas
+            const tiempofinal = new Date()
+            const epochfinal = tiempofinal.getTime()
+            const resta = epochfinal - epochinicio;
+            console.log("Esta operacion tarda en hacerse",resta,"milisegundos")
+          };
+        };
+
+
+        document.getElementById("activarSepia").onclick = function() {
+            var datosSepia  = contexto.getImageData(0, 0, lienzo.width, lienzo.height);                     // Leo los datos
+            var trabajador = new Worker("calculosAWorker.js");                                              // Worker para sepia
+            trabajador.postMessage({ data: datosSepia.data, effect: 'sepia' });                             // Envio los datos y el efecto. En este caso lo cambiamos a sepia       
+            
+            trabajador.onmessage = function(misdatos) {
+                for (let i = 0; i < datosSepia.data.length; i++) {
+                  datosSepia.data[i] = misdatos.data[i];                                                    // Actualizo los datos de la imagen
+                }
+                contexto.putImageData(datosSepia, 0, 0);                                                    // Pego los datos en el canvas
+                const tiempofinal = new Date();
+                const epochfinal = tiempofinal.getTime();
+                const resta = epochfinal - epochinicio;
+                console.log("Esta operación tarda en hacerse", resta, "milisegundos");
+            };
+        };
+
+       
+      };
+    </script>
+   
+  
+    
+</html>

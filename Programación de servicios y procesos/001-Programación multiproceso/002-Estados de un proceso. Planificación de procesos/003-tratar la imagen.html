@@ -4,16 +4,52 @@
     <canvas id="lienzo1"></canvas>
     <script>
         const lienzo = document.querySelector("#lienzo1")
-        lienzo.width = 6000
-        lienzo.height = 4000
+        lienzo.width = 2373
+        lienzo.height = 2048
         const contexto = lienzo.getContext("2d")
         var imagen = new Image()
-        imagen.src = "foto.JPG";
+        imagen.src = "foto.jpg";
         imagen.onload = function(){
           contexto.drawImage(imagen,0,0)
-          var datos = contexto.getImageData(0,0,6000,4000)
+          var datos = contexto.getImageData(0,0,2373,2048)
+          console.log(datos);
           
         }
     </script>
   </body>
 </html>
+
+
+<!-- Ese código JavaScript se utiliza para cargar una imagen en un contexto de lienzo (canvas) y obtener los datos de píxeles de esa imagen. Aquí te explico cada parte:
+
+imagen.onload: Este es un evento que se activa cuando la imagen se ha cargado completamente.
+
+contexto.drawImage(imagen, 0, 0): Esta línea dibuja la imagen en el lienzo en las coordenadas (0, 0).
+
+var datos = contexto.getImageData(0, 0, 2373, 2048): Aquí se obtienen los datos de píxeles del área del lienzo que abarca desde la esquina superior izquierda (0, 0) hasta (2373, 2048). datos será un objeto ImageData que contiene información sobre cada píxel (como el color y la transparencia).
+
+console.log(datos): Finalmente, se imprimen esos datos en la consola, lo que te permite ver la información de los píxeles de la imagen.
+
+Si tienes preguntas específicas sobre alguna parte del código o su funcionamiento, ¡dímelo!
+
+
+La función getImageData devuelve un objeto ImageData, que contiene un array llamado data. Este array incluye los valores de los píxeles en formato RGBA (rojo, verde, azul y alfa) para cada píxel en la región solicitada.
+
+Detalles:
+Estructura del array: El array data es un array unidimensional, donde cada grupo de cuatro elementos representa un píxel. Por ejemplo:
+
+data[0] es el valor de rojo del primer píxel.
+data[1] es el valor de verde del primer píxel.
+data[2] es el valor de azul del primer píxel.
+data[3] es el valor de alfa (transparencia) del primer píxel.
+Número total de píxeles: Si has especificado un ancho de 2373 y un alto de 2048 en getImageData, el número total de píxeles es 
+2373
+×
+2048
+2373×2048. Por lo tanto, el array data tendrá 
+2373
+×
+2048
+×
+4
+2373×2048×4 elementos. -->
