@@ -1,0 +1,8 @@
+a) Se han reconocido los diferentes sistemas ERP-CRM que existen en el mercado.
+
+Concepto de ERP 
+Las siglas ERP significan Enterprise Resource Planning o sistema de planificación de recursos empresariales. 
+Un ERP es un software que permite a las empresas controlar todos los flujos de información que se generan en cada ámbito de la organización. 
+Y su objetivo es integrar la gestión de todos los departamentos.
+De este modo, los ERP suelen estar integrados por diferentes módulos, correspondientes a cada departamento. 
+Los componentes más comunes son los de compras, ventas, inventario, logística, facturación, contabilidad, recursos humanos (RRHH) y CRM (Customer Relationship Management).
