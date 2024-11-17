@@ -1,6 +1,3 @@
-
-
-
 <?php
 
 	class conexionDB{																													// Creo una nueva clase
@@ -12,10 +9,10 @@
 			private $conexion;																										// 
 			
 			public function __construct() {																				// Creo un constructor
-				$this->servidor = "localhost";																			// Le doy los datos de acceso a la base de datos
-				$this->usuario = "appsge";																		// 
-				$this->contrasena = "appsge";																	// 
-				$this->basededatos = "sistemagestionempresa";															// 
+        $this->servidor = "localhost";																			// Le doy los datos de acceso a la base de datos
+        $this->usuario = "crimson";																		// 
+        $this->contrasena = "crimson";																	// 
+        $this->basededatos = "crimson";																// 
         
         $this->conexion = mysqli_connect(
 					$this->servidor, 
@@ -149,7 +146,8 @@
 						INSERT INTO ".$tabla." 
 						(".$campos.") 
 						VALUES (".$datos.");
-						";																													// preparo la petición de inserción
+						";	
+						echo $query;// preparo la petición de inserción
 					$result = mysqli_query($this->conexion , $query);							// Ejecuto la peticion
 					return 0;																											// return 0
 			}

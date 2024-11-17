@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!-- Título de la página -->
+    <title>BJJ ERP</title>
+    
+    <!-- Configuración de caracteres para soporte de acentos y caracteres especiales -->
+    <meta charset="utf-8">
+    
+    <!-- Inclusión de la librería "selectjv" para mejorar elementos select -->
+    <script src="lib/selectjv/selectjv.js"></script>
+    <link rel="stylesheet" href="./lib/selectjv/selectjv.css">
+    
+    <!-- Inclusión del archivo de estilos principal -->
+    <link rel="stylesheet" href="estilo.css">
+    
+    <!-- Scripts para funcionalidades específicas de la aplicación -->
+    <script src="js/convierteTipoDato.js"></script> <!-- Conversión de tipos de datos -->
+    <script src="js/poblarMenuNavegacion.js"></script> <!-- Poblar el menú de navegación -->
+    <script src="js/pueblaTabla.js"></script> <!-- Poblar datos en la tabla -->
+    <script src="js/cargaDatosTabla.js"></script> <!-- Cargar datos dinámicos en la tabla -->
+    
+    <!-- Script principal para el comportamiento de la aplicación -->
+    <script src="comportamiento.js"></script>
+  </head>
+
+  <body>
+    <!-- Encabezado de la aplicación -->
+    <header>
+      APP SGE
+    </header>
+
+    <!-- Contenido principal de la página -->
+    <main>
+      <!-- Menú de navegación lateral -->
+      <nav>
+        <ul>
+          <!-- Aquí se poblarán los elementos del menú dinámicamente -->
+        </ul>
+      </nav>
+
+      <!-- Sección principal para mostrar la tabla de clientes -->
+      <section>
+        <!-- Botón para insertar un nuevo elemento en la tabla -->
+        <button id="insertar" jvtooltip="Creamos un nuevo elemento">+</button>
+        
+        <!-- Título y descripción de la tabla -->
+        <div class="titulotabla">
+          <h5>Clientes</h5>
+          <p>En esta tabla podremos insertar a los clientes</p>
+        </div>
+
+        <!-- Tabla para mostrar los datos de los clientes -->
+        <table>
+          <thead>
+            <tr>
+              <!-- Aquí se agregarán los encabezados de la tabla dinámicamente -->
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Aquí se poblarán las filas de datos dinámicamente -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- Modal (ventana emergente) para mostrar información adicional o formularios -->
+    <div id="modal">
+      <div id="contienemodal"></div>
+    </div>
+
+    <!-- Librería "jvampliador" para ampliar imágenes u otros elementos -->
+    <link rel="stylesheet" href="./lib/jvampliador/jvampliador.css">
+    <script src="./lib/jvampliador/jvampliador.js"></script>
+
+    <!-- Librería "jvtooltip" para mostrar información al pasar el cursor por ciertos elementos -->
+    <script src="./lib/jvtooltip/jvtooltip.js"></script>
+    <link rel="stylesheet" href="./lib/jvtooltip/jvtooltip.css">
+  </body>
+</html>

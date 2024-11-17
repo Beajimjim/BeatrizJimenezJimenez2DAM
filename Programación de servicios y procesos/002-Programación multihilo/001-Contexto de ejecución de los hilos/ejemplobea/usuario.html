@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+    <title>Registro de Usuario</title>
+    <style>
+        /* Estilos para el cuerpo de la página */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex; /* Usar flexbox para centrar los elementos */
+            flex-direction: column;
+            align-items: center; /* Centrar horizontalmente */
+            padding-top: 50px; /* Espacio superior */
+        }
+
+        /* Estilos para el campo de entrada y el botón */
+        input, button {
+            padding: 10px; /* Espacio interno */
+            margin: 10px; /* Espacio externo */
+            width: 300px; /* Ancho fijo */
+        }
+
+        /* Estilo para el mensaje de respuesta */
+        #mensaje {
+            margin-top: 20px;
+            color: green; /* Texto en color verde */
+        }
+    </style>
+</head>
+<body>
+    <!-- Título de la página -->
+    <h1>Ingresa tu nombre</h1>
+
+    <!-- Campo de entrada para el nombre del usuario -->
+    <input id="usuario" placeholder="Introduce tu nombre">
+
+    <!-- Botón para enviar el nombre -->
+    <button id="enviar">Enviar</button>
+
+    <!-- Contenedor para mostrar el mensaje de respuesta -->
+    <div id="mensaje"></div>
+
+    <script>
+        // Obtener referencias a los elementos del DOM
+        const boton = document.getElementById("enviar");
+        const entrada = document.getElementById("usuario");
+        const mensaje = document.getElementById("mensaje");
+
+        // Manejar el evento de clic en el botón
+        boton.onclick = function() {
+            // Obtener el valor ingresado por el usuario
+            const usuario = entrada.value;
+
+            // Verificar si el campo de entrada está vacío
+            if (usuario === "") {
+                alert("Por favor, ingresa tu nombre."); // Mostrar alerta si no se ingresó un nombre
+                return; // Detener la ejecución si el campo está vacío
+            }
+
+            // Enviar el nombre al servidor usando fetch
+            fetch("registro.php?usuario=" + encodeURI(usuario))
+                .then(response => response.text()) // Obtener la respuesta como texto
+                .then(data => {
+                    // Mostrar el mensaje de respuesta en la página
+                    mensaje.textContent = data;
+
+                    // Limpiar el campo de entrada después de enviar
+                    entrada.value = "";
+                });
+        };
+    </script>
+</body>
+</html>

@@ -1,23 +1,43 @@
 <!doctype html>
 <html>
 	<head>
-	
+		<!-- Aquí normalmente se colocan los metadatos y el título de la página -->
 	</head>
-	<body>	<input>
+	<body>
+		<!-- Campo de entrada para que el usuario ingrese su nombre -->
+		<input placeholder="Ingresa tu nombre">
+
 		<script>
-			var entrada = document.querySelector("input")
-			entrada.onchange = function(){
-				console.log("Ok te has identificado como",this.value)
-				fetch("006.php?usuario="+encodeURI(this.value))
-				.then(function(response){
-					return response.text()
-				})
-				.then(function(datos){
-					console.log(datos)
-					let conjunto = JSON.parse(datos)
-					console.log(conjunto)
-				})
-			}
+			// Selecciona el campo de entrada <input> usando 'querySelector'
+			// 'querySelector("input")' busca el primer elemento <input> en el documento HTML
+			var entrada = document.querySelector("input");
+
+			// Asigna una función al evento 'onchange' del campo de entrada
+			// 'onchange' se activa cuando el usuario cambia el contenido del input y sale del campo
+			entrada.onchange = function() {
+				// Muestra un mensaje en la consola indicando que el usuario ha sido identificado
+				console.log("Ok te has identificado como", this.value);
+
+				// Realiza una solicitud al servidor usando 'fetch'
+				// Aquí se hace una solicitud HTTP GET al archivo '006.php', pasando el nombre del usuario como parámetro
+				fetch("006.php?usuario=" + encodeURI(this.value))
+					// 'then()' maneja la respuesta del servidor
+					// 'response.text()' convierte la respuesta a texto plano
+					.then(function(response) {
+						return response.text(); // Devuelve el contenido de la respuesta como texto
+					})
+					// Maneja los datos recibidos del servidor
+					.then(function(datos) {
+						// Muestra los datos recibidos en la consola del navegador
+						console.log(datos);
+
+						// Convierte el texto recibido (en formato JSON) a un objeto JavaScript
+						let conjunto = JSON.parse(datos);
+
+						// Muestra el objeto JavaScript convertido en la consola para verificar su contenido
+						console.log(conjunto);
+					});
+			};
 		</script>
 	</body>
 </html>

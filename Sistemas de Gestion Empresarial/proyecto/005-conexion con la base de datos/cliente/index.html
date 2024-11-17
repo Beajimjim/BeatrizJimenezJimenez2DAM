@@ -1,29 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERP Beatriz Jimenez Jimenez</title>
-  <link rel="stylesheet" href="estilologin.css">
-  <script src="login.js"></script>
-</head>
-<body>
-  <div class="login">
-    <section class="login_container" >
-      <div class="login_container_logo">
-        <img src="img/logoLogin.png" alt="" class="login_container_logo_img">
-      </div>
-      <div class="login_container_form padding">
-        <div class="login_container_form_input">
-          <h1 class="text_aling_center font_size_title">Bienvenido</h1>
-          <label for=""><h4 class="text_aling_center font_size_subtitle">Introduce tus datos de acceso</h4></label>
-          <input type="text" id="usuario" placeholder="Usuario" class="login_input">        
-          <input type="password" id="password" placeholder="Contraseña" class="login_input">
-          <button class="login_button" id="send_usuario_login"><h3>Enviar</h3></button>
-        </div>      
-      </div>
-    </section>
-   
-  </div>
-</body>
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>
+      ERP Beatriz Jimenez
+    </title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="estilologin.css">
+    <script src="login.js"></script>
+  </head>
+  <body>
+    <div id="formlogin">
+      <img src="img/logoLogin.png" id="logo">
+      <input type="text" id="usuario" placeholder="Usuario:">
+      <input type="text" id="contrasena" placeholder="Contraseña">
+      <button id="login">Login</button>
+    </div>
+  </body>
 </html>

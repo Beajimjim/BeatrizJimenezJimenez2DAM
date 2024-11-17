@@ -1,15 +1,29 @@
 <!doctype html>
 <html>
 	<head>
-	
+		<!-- Título de la página que aparece en la pestaña del navegador -->
+		<title>Solicitud al Servidor</title>
 	</head>
-	<body>	<input>
+	<body>
+		<!-- Campo de entrada para que el usuario ingrese su nombre -->
+		<!-- El atributo 'placeholder' muestra un texto guía dentro del campo antes de que el usuario escriba -->
+		<input placeholder="Ingresa tu nombre">
+		
 		<script>
-			var entrada = document.querySelector("input")
-			entrada.onchange = function(){
-				console.log("Ok te has identificado como",this.value)
-				fetch("003.php?usuario="+encodeURI(this.value))
-			}
+			// Selecciona el campo de entrada <input> usando 'querySelector'
+			// 'querySelector("input")' selecciona el primer elemento <input> que encuentra en el documento
+			var entrada = document.querySelector("input");
+
+			// Evento 'onchange' se activa cuando el usuario cambia el contenido del campo y sale del campo (por ejemplo, presionando "Enter")
+			entrada.onchange = function() {
+				// Muestra en la consola del navegador el valor ingresado por el usuario
+				console.log("Ok te has identificado como", this.value);
+
+				// Realiza una solicitud al servidor usando 'fetch'
+				// 'fetch' es una función que permite hacer solicitudes HTTP de forma asincrónica
+				// Aquí se está haciendo una solicitud GET a '003.php', enviando el nombre del usuario como parámetro
+				fetch("003.php?usuario=" + encodeURI(this.value));
+			};
 		</script>
 	</body>
 </html>

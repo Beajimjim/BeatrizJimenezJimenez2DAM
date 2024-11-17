@@ -1,0 +1,68 @@
+/* Definición de la fuente personalizada usando @font-face */
+@font-face {
+  font-family: Ubuntu; /* Nombre de la fuente */
+  src: url(../Ubuntu-R.ttf); /* Ruta del archivo de la fuente */
+}
+
+/* Estilos globales para html y body */
+html, body {
+  padding: 50px; /* Espaciado interno para todo el documento */
+  margin: 0px; /* Elimina márgenes por defecto */
+  background: #985277; /* Color de fondo (tono púrpura oscuro) */
+  color: white; /* Color de texto blanco */
+  font-family: Ubuntu, sans-serif; /* Fuente personalizada con respaldo genérico */
+  text-align: center; /* Alineación centrada del texto */
+}
+
+/* Estilo del contenedor principal */
+main {
+  box-sizing: border-box; /* Incluye el padding dentro del ancho del contenedor */
+  padding: 20px; /* Espaciado interno */
+  display: grid; /* Utiliza un diseño de cuadrícula */
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); /* Columnas flexibles, mínimo 12.5rem */
+  grid-auto-rows: calc(16.5rem * 9 / 16); /* Altura automática, basada en la proporción 16:9 */
+  gap: 10px; /* Espacio entre los elementos del grid */
+  padding: 40px; /* Espaciado interno adicional */
+  transform-style: preserve-3d; /* Permite transformaciones 3D */
+  transition: transform 0.1s ease; /* Suaviza las transiciones */
+  width: 100%; /* Ocupa todo el ancho disponible */
+}
+
+/* Estilo para los elementos de aplicación dentro del contenedor */
+.aplicacion {
+  border: 0px solid #fff; /* Borde (inicialmente no visible) */
+  display: block; /* Elemento de bloque */
+  align-items: center; /* Alineación centrada vertical (si fuera un contenedor flex) */
+  justify-content: center; /* Alineación centrada horizontal (si fuera un contenedor flex) */
+  font-size: 1.5rem; /* Tamaño de fuente */
+  text-align: center; /* Centra el texto */
+  background-size: cover; /* La imagen de fondo cubre toda el área */
+  background-position: center; /* Centra la imagen de fondo */
+  opacity: 0.7; /* Opacidad inicial del 70% */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Transición suave de opacidad y transformaciones */
+  background: white; /* Fondo blanco por defecto */
+  position: relative; /* Posicionamiento relativo para elementos internos */
+  cursor: pointer; /* Cambia el cursor al pasar por encima */
+  border-radius: 5px; /* Esquinas redondeadas */
+  color: #985277; /* Color del texto (mismo tono que el fondo del body) */
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.3); /* Sombra inicial (sin desplazamiento ni tamaño) */
+  transition: all 1s; /* Transición suave para todos los cambios */
+}
+
+/* Estilo para el icono dentro de .aplicacion */
+.icono {
+  font-size: 72px; /* Tamaño grande para el icono */
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  font-weight: bold; /* Texto en negrita */
+}
+
+/* Estilo para el logo */
+#logo {
+  width: 300px; /* Ancho del logo */
+}
+
+/* Estilo para cuando se pasa el cursor sobre un elemento de aplicación */
+.aplicacion:hover {
+  opacity: 1; /* Aumenta la opacidad al 100% */
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3); /* Aplica una sombra más pronunciada */
+}

@@ -6,7 +6,13 @@
 	include "ConexionDB.php";																										// incluyo el archivo en el cual se encuentra la clase
 	
 	$conexion = new conexionDB();																								// Creo una nueva instancia de la clase
+	if(isset($_GET['o'])){
+		switch($_GET['o']){
+			case "listatablas":
+				echo $conexion->listadoTablas();																						// Llamo a un metodo
+				break;
+		}
+	}
 	
-	echo $conexion->seleccionaTabla("lineaspedido");																						// Llamo a un metodo
 	
 ?>

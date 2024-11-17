@@ -24,4 +24,4 @@ def toma():                                                 # Defino una funcion
     return str({"mensaje":"ok"})                            # Devuelvo un json que dice ok
 
 if __name__ == '__main__':                                  # Si esta es la clase principal
-    app.run(debug=True, host='192.168.1.225')               # Ejecuta la aplicación y escucha en el puerto 5000, en la ip que indico
+    app.run(debug=True, host='192.168.1.151', port=5001)               # Ejecuta la aplicación y escucha en el puerto 5000, en la ip que indico

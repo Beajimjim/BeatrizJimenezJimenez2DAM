@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+    <!-- Título de la página -->
+    <title>Panel de Administracion</title>
+    <style>
+        /* Estilo general del cuerpo */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        /* Estilo de la tabla */
+        table {
+            width: 100%; /* Ocupa todo el ancho disponible */
+            border-collapse: collapse; /* Elimina el espacio entre bordes */
+        }
+
+        /* Estilo para celdas de la tabla */
+        th, td {
+            padding: 10px; /* Espacio interno en celdas */
+            border: 1px solid #ddd; /* Borde gris claro */
+        }
+
+        /* Estilo para los encabezados de la tabla */
+        th {
+            background-color: #f4f4f4; /* Fondo gris claro */
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado de la página -->
+    <h1>Panel de Administracion</h1>
+
+    <!-- Tabla para mostrar los datos de los usuarios -->
+    <table>
+        <thead>
+            <tr>
+                <th>Usuario</th> <!-- Columna para el nombre del usuario -->
+                <th>Tareas</th> <!-- Columna para las tareas asignadas -->
+                <th>Resultado (Suma)</th> <!-- Columna para el resultado calculado -->
+            </tr>
+        </thead>
+        <tbody id="tabla-usuarios"></tbody> <!-- Cuerpo de la tabla donde se insertarán los datos -->
+    </table>
+
+    <script>
+        // Hacer una solicitud al servidor para obtener los datos del archivo 'mostrar.php'
+        fetch("mostrar.php")
+            .then(response => response.json()) // Convertir la respuesta a formato JSON
+            .then(data => {
+                // Obtener la referencia al cuerpo de la tabla
+                const tabla = document.getElementById("tabla-usuarios");
+                tabla.innerHTML = ""; // Limpiar el contenido de la tabla
+
+                // Recorrer el arreglo de datos de usuarios
+                data.forEach(usuario => {
+                    // Crear una fila para cada usuario
+                    const fila = document.createElement("tr");
+
+                    // Crear una lista de tareas separadas por comas
+                    const tareas = usuario.tareas.join(", ");
+                    const resultado = usuario.resultado;
+
+                    // Insertar los datos del usuario en la fila utilizando template literals
+                    fila.innerHTML = `
+                        <td>${usuario.usuario}</td> <!-- Nombre del usuario -->
+                        <td>${tareas}</td> <!-- Lista de tareas del usuario -->
+                        <td>${resultado}</td> <!-- Resultado de la suma de tareas -->
+                    `;
+                    // Agregar la fila al cuerpo de la tabla
+                    tabla.appendChild(fila);
+                });
+            })
+            .catch(error => console.error("Error al obtener los datos:", error)); // Manejar errores en la solicitud
+    </script>
+</body>
+</html>

@@ -1,31 +1,19 @@
-window.onload = function() { // Se ejecuta cuando la ventana se ha cargado completamente.
-    // Llama a un microservicio que devuelve la lista de aplicaciones.
-    fetch("../../servidor/lista_aplicaciones.php")         
+window.onload = function(){
+    fetch("../../servidor/lista_aplicaciones.php")         // LLamo a un microservicio que me da la lista de aplicaciones
         .then(response => {
-            return response.json(); // Convierte la respuesta del servidor a formato JSON.
+          return response.json();                       // Quiero que el servidor me devuelva un json
         })
         .then(data => {
-            // Carga el template HTML de las aplicaciones.
-            const plantilla = document.getElementById('plantilla_aplicacion');              
-            console.log(data); // Imprime el JSON en la consola para verificar el contenido.
-
-            // Itera sobre cada elemento recibido del JSON.
-            data.forEach(function(elemento) {                                              
-                console.log(elemento); // Muestra cada elemento en la consola para comprobar que se recibe correctamente.
-
-                // Clona la plantilla HTML para crear una nueva instancia.
-                const instancia = plantilla.content.cloneNode(true);                        
-                
-                // Selecciona el elemento <p> dentro de la plantilla.
-                const nombre = instancia.querySelector('p');                                
-                nombre.innerHTML = elemento.nombre; // Establece el nombre de la aplicación en el <p>.
-
-                // Selecciona el elemento <img> dentro de la plantilla.
-                const imagen = instancia.querySelector("img");
-                imagen.setAttribute("src", "img/" + elemento.icono); // Establece la fuente de la imagen usando el ícono del JSON.
-
-                // Agrega la nueva instancia al árbol HTML dentro del elemento <main>.
-                document.querySelector('main').appendChild(instancia);                      
+            const plantilla = document.getElementById('plantilla_aplicacion');              // Cargo el template HTML como una plantilla en memoria (como un class)
+            console.log(data)                                                               // Vomito el json en pantalla
+            data.forEach(function(elemento) {                                               // Para cada uno de los elementos que vienen en el json de la base de datos
+                console.log(elemento);                                                      // Pongo el elemento en pantalla simplemente para comprobar que funciona
+                const instancia = plantilla.content.cloneNode(true);                        // Creo  una nueva instancia de la clase (como un instance)
+                const nombre = instancia.querySelector('p');                                // Dentro de la plantilla selecciono a uno de los elementos
+                nombre.innerHTML = elemento.nombre;                                         // Y le pongo el contenido que saco del json
+                const imagen = instancia.querySelector("img")
+                imagen.setAttribute("src","img/"+elemento.icono)
+                document.querySelector('main').appendChild(instancia);                      // Por ultimo realmente pongo la instancia en el arbol html
             });
-        });
+        })
 }

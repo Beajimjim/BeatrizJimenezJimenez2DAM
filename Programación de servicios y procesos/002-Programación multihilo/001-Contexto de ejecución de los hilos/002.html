@@ -1,14 +1,25 @@
 <!doctype html>
 <html>
 	<head>
-	
+		<!-- Título de la página que se muestra en la pestaña del navegador -->
+		<title>Identificación del Usuario</title>
 	</head>
-	<body>	<input>
+	<body>
+		<!-- Campo de entrada para que el usuario ingrese texto -->
+		<!-- El atributo 'placeholder' muestra un texto guía dentro del campo antes de que el usuario escriba -->
+		<input placeholder="Ingresa tu nombre">
+		
 		<script>
-			var entrada = document.querySelector("input")
-			entrada.onchange = function(){
-				console.log("Ok te has identificado como",this.value)
-			}
+			// Selecciona el campo de entrada usando 'querySelector', que busca el primer elemento <input> en la página
+			var entrada = document.querySelector("input");
+
+			// Asigna una función al evento 'onchange' del campo de entrada
+			// 'onchange' se activa cuando el usuario termina de escribir y cambia el valor del campo
+			entrada.onchange = function() {
+				// Muestra un mensaje en la consola del navegador
+				// 'this.value' contiene el texto ingresado por el usuario
+				console.log("Ok te has identificado como", this.value);
+			};
 		</script>
 	</body>
 </html>

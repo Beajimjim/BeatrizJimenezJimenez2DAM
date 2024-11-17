@@ -1,5 +1,5 @@
 <?php
 
-	echo '{"resultado":"Ok"}';
+	echo '{"resultado":"ok pero ok de verdad de la buena"}';
 
 ?>

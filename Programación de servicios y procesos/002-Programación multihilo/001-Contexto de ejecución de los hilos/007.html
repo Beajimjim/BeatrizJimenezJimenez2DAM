@@ -1,28 +1,54 @@
 <!doctype html>
 <html>
 	<head>
-	
+		<!-- Aquí normalmente se colocan los metadatos y el título de la página -->
 	</head>
-	<body>	<input>
+	<body>
+		<!-- Campo de entrada donde el usuario puede escribir su nombre -->
+		<input placeholder="Ingresa tu nombre">
+
 		<script>
-			var entrada = document.querySelector("input")
-			entrada.onchange = function(){
-				console.log("Ok te has identificado como",this.value)
-				fetch("007.php?usuario="+encodeURI(this.value))
-				.then(function(response){
-					return response.text()
-				})
-				.then(function(datos){
-					console.log(datos)
-					let conjunto = JSON.parse(datos)
-					console.log(conjunto)
-					let suma = 0;
-					for(let i = 0;i<conjunto.length;i++){
-						suma += conjunto[i]
-					}
-					console.log(suma)
-				})
-			}
+			// Selecciona el campo de entrada usando 'querySelector'
+			// 'querySelector("input")' busca el primer elemento <input> en el documento HTML
+			var entrada = document.querySelector("input");
+
+			// Define una función que se ejecuta cuando el usuario cambia el valor del campo de entrada
+			// 'onchange' se activa cuando el usuario termina de escribir y sale del campo de entrada
+			entrada.onchange = function() {
+				// Muestra en la consola un mensaje indicando que se ha capturado el nombre del usuario
+				console.log("Ok te has identificado como", this.value);
+
+				// Realiza una solicitud al servidor usando 'fetch'
+				// La solicitud se envía al archivo '007.php' con el nombre del usuario como parámetro
+				fetch("007.php?usuario=" + encodeURI(this.value))
+					// Maneja la respuesta del servidor
+					.then(function(response) {
+						// Convierte la respuesta del servidor a texto
+						return response.text();
+					})
+					// Procesa los datos recibidos del servidor
+					.then(function(datos) {
+						// Muestra los datos recibidos en la consola (se espera que sea un texto en formato JSON)
+						console.log(datos);
+
+						// Convierte el texto recibido (en formato JSON) a un array de JavaScript
+						let conjunto = JSON.parse(datos);
+
+						// Muestra el array convertido en la consola para verificar su contenido
+						console.log(conjunto);
+
+						// Inicializa una variable para almacenar la suma de los elementos del array
+						let suma = 0;
+
+						// Recorre el array 'conjunto' y suma cada elemento al total acumulado
+						for (let i = 0; i < conjunto.length; i++) {
+							suma += conjunto[i]; // Agrega el valor del elemento actual a 'suma'
+						}
+
+						// Muestra en la consola la suma total de los elementos del array
+						console.log(suma);
+					});
+			};
 		</script>
 	</body>
 </html>

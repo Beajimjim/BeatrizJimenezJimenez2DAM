@@ -1,76 +1,33 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+html,body{
+  padding:50px;
+  margin:0px;
 }
+main {
+box-sizing:border-box;
+    padding:20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+      grid-auto-rows: calc(16.5rem * 9 / 16);
+      gap: 10px;
+      padding: 40px;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease;
+      width: 100%;
+  }
 
-html, body {
-    height: 100%;
-    overflow: hidden; /* Evita el scroll */
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    background-color: #f0f0f0; /* Color de fondo general */
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #985277; /* Color púrpura para el header */
-    width: 100%;
-    padding: 20px 40px;
-    color: white;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-header h1 {
-    margin: 0;
-}
-
-.logout-button {
-    background-color: #faa916; /* Color amarillo para el botón */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.logout-button:hover {
-    background-color: #e8a000; /* Color amarillo más oscuro al pasar el mouse */
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 10px;
-    flex-grow: 1; /* Ocupa el espacio restante */
-    padding: 20px; /* Espacio interior */
-}
-
-.aplicacion {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #faa916; /* Color amarillo para las celdas */
-    color: white;
-    font-size: 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.aplicacion:hover {
-    background-color: #e8a000; /* Color amarillo más oscuro al pasar el mouse */
-}
-
-.main_application_icon{
-    width: 2rem;
-    height: 2rem;
-} 
+  .aplicacion {
+      border: 0px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      background: rgb(100, 100, 100);
+      position: relative;
+      cursor: pointer;
+      border-radius:5px;
+  }

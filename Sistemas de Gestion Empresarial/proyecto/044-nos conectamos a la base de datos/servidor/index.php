@@ -22,7 +22,7 @@
 				break;
 			case "buscar":
 				$json = file_get_contents('php://input');                   								// Recojo los datos que vienen en json desde la petición del cliente
-        		$datos = json_decode($json, true);																					// Me aseguro que ese json tenga una forma que PHP pueda entender
+        $datos = json_decode($json, true);																					// Me aseguro que ese json tenga una forma que PHP pueda entender
 				echo $conexion->buscar($_GET['tabla'],$datos);																						// Llamo a un metodo
 				break;
 		}

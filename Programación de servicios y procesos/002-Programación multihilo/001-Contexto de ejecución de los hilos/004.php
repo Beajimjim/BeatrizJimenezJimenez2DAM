@@ -1,16 +1,21 @@
 <?php
+    // Define el nombre del archivo donde se almacenan las tareas
     $file = 'tareas.txt';
 
-    // Read the file into an array, where each element is a line
+    // Lee el contenido del archivo y lo guarda en un array, donde cada línea es un elemento del array
+    // 'file($file)' devuelve un array donde cada elemento es una línea del archivo
     $lines = file($file);
 
-    // Output the first line
+    // Muestra la primera línea del archivo al cliente
+    // '$lines[0]' es el primer elemento del array, es decir, la primera línea del archivo
     echo $lines[0];
 
-    // Remove the first line
+    // Elimina la primera línea del array usando 'array_shift'
+    // 'array_shift($lines)' elimina el primer elemento del array y reordena los índices
     array_shift($lines);
 
-    // Save the remaining lines back into the file, using "\n" to keep the file's line breaks
+    // Guarda las líneas restantes de vuelta en el archivo
+    // 'implode("", $lines)' convierte el array en una cadena de texto, uniendo las líneas sin separadores adicionales
+    // 'file_put_contents($file, ...)' sobrescribe el archivo con el contenido actualizado
     file_put_contents($file, implode('', $lines));
-
 ?>

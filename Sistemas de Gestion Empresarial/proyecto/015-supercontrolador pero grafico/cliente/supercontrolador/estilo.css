@@ -1,106 +1,39 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+body,html{
+  font-family:sans-serif;
+  background:#985277;
+  padding:0px;
+  height:100%;
+  margin:0px;
+  color:white;
 }
-
-body {
-  font-family: Arial, sans-serif;
-  overflow: hidden; /* Evita el scroll de fondo cuando el menú está abierto */
+header{
+  padding:20px;
 }
-
-.menu-toggle {
-  display: none; /* Ocultar el checkbox */
+main{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: stretch;
+	align-content: stretch;
+	height:100%;
 }
-
-.sidebar {
-  height: 100%;
-  width: 250px; /* Ancho del menú lateral */
-  position: fixed; /* Fijo en pantalla */
-  top: 0;
-  left: -250px; /* Oculto inicialmente */
-  background-color: #faa916;
-  color: white;
-  transition: left 0.3s ease; /* Transición suave */
-  padding: 20px;
-  z-index: 1000; /* Asegura que el menú esté en la parte superior */
+main nav{
+  width:20%;
+  height:100%;
 }
-
-.sidebar h2 {
-  text-align: center;
+main section{
+  width:80%;
+  background:white;
+  height:100%;
+  border-radius:20px 0px 0px 0px;
+  color:black;
 }
-
-.sidebar ul {
-  list-style-type: none;
-  padding: 0;
+nav ul{
+  list-style-type:none;
+  padding:0px;
 }
-
-.sidebar ul li {
-  margin: 20px 0;
-}
-
-.sidebar ul li a {
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-  display: block;
-  transition: background 0.3s;
-}
-
-.sidebar ul li a:hover {
-  background-color: #985277b0;
-}
-
-.close-btn {
-  font-size: 30px;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.content {
-  padding: 20px;
-}
-
-.open-btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* Mostrar el menú al marcar el checkbox */
-.menu-toggle:checked ~ .sidebar {
-  left: 0; /* Mostrar el menú */
-}
-
-
-.hamburger-icon {
-  width: 30px; /* Ancho del icono */
-  height: 20px; /* Alto del icono */
-  position: relative; /* Para posicionar las líneas */
-}
-
-.hamburger-icon::before,
-.hamburger-icon::after,
-.hamburger-icon div {
-  content: "";
-  display: block;
-  height: 4px; /* Altura de las líneas */
-  background-color: black; /* Color de las líneas */
-  width: 100%; /* Ancho completo */
-  position: absolute; /* Posicionar las líneas */
-  left: 0;
-  transition: all 0.3s; /* Transiciones suaves */
-}
-
-.hamburger-icon::before {
-  top: 0; /* Primera línea arriba */
-}
-
-.hamburger-icon div {
-  top: 50%; /* Línea del medio */
-  transform: translateY(-50%); /* Centrar la línea del medio */
-}
-
-.hamburger-icon::after {
-  bottom: 0; /* Última línea abajo */
+nav ul li{
+  padding:15px;
+  cursor:pointer;
 }

@@ -11,4 +11,4 @@ def inicio():
     return "Te quedan "+str(inventario)+" elementos en el inventario"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.1.225')
+    app.run(debug=True, host='192.168.1.151')

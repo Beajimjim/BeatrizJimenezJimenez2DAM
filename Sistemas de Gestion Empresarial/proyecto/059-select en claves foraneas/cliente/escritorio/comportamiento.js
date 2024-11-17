@@ -1,42 +1,26 @@
-window.onload = function() { // Función que se ejecuta cuando la ventana se ha cargado completamente.
-    // Se realiza una petición fetch al microservicio que devuelve la lista de aplicaciones.
-    fetch("../../servidor/?o=tabla&tabla=aplicaciones")      
+window.onload = function(){
+    fetch("../../servidor/?o=tabla&tabla=aplicaciones")         // LLamo a un microservicio que me da la lista de aplicaciones
         .then(response => {
-            return response.json(); // Se espera que el servidor devuelva un JSON como respuesta.
+          return response.json();                       // Quiero que el servidor me devuelva un json
         })
         .then(data => {
-            // Se carga el template HTML como una plantilla en memoria.
-            const plantilla = document.getElementById('plantilla_aplicacion');              
-            console.log(data); // Se muestra el JSON en consola para depuración.
-
-            // Se itera sobre cada elemento que viene en el JSON.
-            data.forEach(function(elemento) {                                              
-                console.log(elemento); // Se muestra cada elemento en consola para comprobar su contenido.
-
-                // Se crea una nueva instancia de la plantilla.
-                const instancia = plantilla.content.cloneNode(true);                        
-                
-                // Se selecciona el párrafo dentro de la plantilla para modificar su contenido.
-                const nombre = instancia.querySelector('p');                                
-                nombre.innerHTML = elemento.nombre; // Se establece el nombre de la aplicación desde el JSON.
-                
-                // Se selecciona la imagen dentro de la plantilla.
-                const imagen = instancia.querySelector("img");
-                imagen.setAttribute("src", "img/" + elemento.icono); // Se establece la ruta de la imagen desde el JSON.
-
-                // Se añade la instancia al árbol HTML en el elemento <main>.
-                document.querySelector('main').appendChild(instancia);                      
+            const plantilla = document.getElementById('plantilla_aplicacion');              // Cargo el template HTML como una plantilla en memoria (como un class)
+            console.log(data)                                                               // Vomito el json en pantalla
+            data.forEach(function(elemento) {                                               // Para cada uno de los elementos que vienen en el json de la base de datos
+                console.log(elemento);                                                      // Pongo el elemento en pantalla simplemente para comprobar que funciona
+                const instancia = plantilla.content.cloneNode(true);                        // Creo  una nueva instancia de la clase (como un instance)
+                const nombre = instancia.querySelector('p');                                // Dentro de la plantilla selecciono a uno de los elementos
+                nombre.innerHTML = elemento.nombre;                                         // Y le pongo el contenido que saco del json
+                const imagen = instancia.querySelector("img")
+                imagen.setAttribute("src","img/"+elemento.icono)
+                document.querySelector('main').appendChild(instancia);                      // Por ultimo realmente pongo la instancia en el arbol html
             });
             
-            // Selecciono todas las aplicaciones que tienen la clase "aplicacion" y las guardo en un array.
-            let aplicaciones = document.querySelectorAll(".aplicacion");                     
-            
-            // Se itera sobre cada aplicación seleccionada.
-            aplicaciones.forEach(function(aplicacion) {                                     
-                // Se asigna una función al evento de clic para cada aplicación.
-                aplicacion.onclick = function() {                                            
-                    window.location = "../supercontrolador/"; // Redirige a la página del supercontrolador al hacer clic.
+            let aplicaciones = document.querySelectorAll(".aplicacion")                     // Selecciono todas las aplicaciones y las pongo en un array
+            aplicaciones.forEach(function(aplicacion){                                      // Para cada una de las aplicaciones
+                aplicacion.onclick = function(){                                            // Cuando haga click en esa aplicacion
+                    window.location = "../supercontrolador/"
                 }
-            });
-        });
+            })
+        })
 }

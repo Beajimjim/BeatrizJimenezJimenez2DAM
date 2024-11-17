@@ -1,6 +1,9 @@
 <?php
-		 // Me conecto a la base de datos utilizando las credenciales y el nombre de la base de datos
-    $mysqli = mysqli_connect("localhost", "appsge", "appsge", "sistemagestionempresa");																	// Me conecto a la base de datos
+		$mysqli = mysqli_connect(
+		"localhost", 
+		"crimson", 
+		"crimson", 
+		"crimson");																								// Me conecto a la base de datos
 		
     $peticion = "INSERT INTO clientes VALUES(NULL,";					// Comienzo a formatear la peticion
     
