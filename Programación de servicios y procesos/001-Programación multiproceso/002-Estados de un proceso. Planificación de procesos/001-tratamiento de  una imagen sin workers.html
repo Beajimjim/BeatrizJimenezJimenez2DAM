@@ -1,13 +1,23 @@
 <!doctype html>
 <html>
   <body>
+    <!-- Canvas donde se dibujarán las imágenes y se realizarán operaciones -->
     <canvas id="lienzo1"></canvas>
+    
     <script>
-        const lienzo = document.querySelector("#lienzo1")
-        lienzo.width = 2373
-        lienzo.height = 2048
-        const contexto = lienzo.getContext("2d")        
-      
+        // Seleccionamos el elemento <canvas> del DOM usando su ID
+        const lienzo = document.querySelector("#lienzo1");
+
+        // Establecemos el ancho del canvas en píxeles (2373 píxeles)
+        lienzo.width = 2373;
+
+        // Establecemos la altura del canvas en píxeles (2048 píxeles)
+        lienzo.height = 2048;
+
+        // Creamos un contexto 2D, que nos permite dibujar y manipular gráficos dentro del canvas
+        const contexto = lienzo.getContext("2d");
+
+        // Aquí el contexto queda listo para trabajar, pero no se han agregado más operaciones
     </script>
   </body>
 </html>

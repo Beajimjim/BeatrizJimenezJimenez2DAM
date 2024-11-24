@@ -1,35 +1,90 @@
 <!doctype html>
 <html>
   <body>
+    <!-- Definimos un canvas donde se dibujará y procesará la imagen -->
     <canvas id="lienzo1"></canvas>
     <script>
-        const tiempoinicio = new Date()
-        const epochinicio = tiempoinicio.getTime()
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 2373
-        lienzo.height = 2048                                   // Le pongo 4000 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "foto1.JPG";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          var datos = contexto.getImageData(0,0,2373,500)      // Leo los datos a la memoria
-          var trabajador = new Worker("008-worker.js");
-          trabajador.postMessage(datos.data)
-          
-          trabajador.onmessage = function(misdatos){
-            for(let i = 0;i<datos.data.length;i++){
-              datos.data[i] = misdatos.data[i]
-            }
-            //console.log(datos.data)
-            contexto.putImageData(datos,0,0)                      // Pego los datos en una imagen en el canvas
-            const tiempofinal = new Date()
-            const epochfinal = tiempofinal.getTime()
-            const resta = epochfinal - epochinicio;
-            console.log("Esta operacion tarda en hacerse",resta,"milisegundos")
-          }
-          
-        }
+        // Registra el tiempo de inicio del proceso (en milisegundos)
+        const tiempoinicio = new Date(); // Obtiene la fecha y hora actuales
+        const epochinicio = tiempoinicio.getTime(); // Convierte la fecha en milisegundos desde el epoch (1970)
+
+        // Selecciona el elemento <canvas> del DOM utilizando su ID
+        const lienzo = document.querySelector("#lienzo1");
+        
+        // Establece las dimensiones del canvas
+        lienzo.width = 2373; // Ancho del canvas
+        lienzo.height = 2048; // Altura del canvas
+
+        // Crea un contexto 2D, que proporciona métodos para dibujar y manipular gráficos en el canvas
+        const contexto = lienzo.getContext("2d");
+
+        // Crea un nuevo objeto de imagen para cargar la imagen que se procesará
+        var imagen = new Image();
+
+        // Especifica la fuente (ruta) de la imagen
+        imagen.src = "foto1.JPG";
+
+        // Define una función que se ejecutará automáticamente cuando la imagen haya cargado completamente
+        imagen.onload = function() {
+            // Dibuja la imagen en el canvas, posicionándola en la esquina superior izquierda (0, 0)
+            contexto.drawImage(imagen, 0, 0);
+
+            // Obtiene los datos de píxeles de un área específica del canvas
+            // En este caso, desde (0, 0) hasta (2373, 500) píxeles
+            var datos = contexto.getImageData(0, 0, 2373, 500);
+
+            // Crea un nuevo Worker para procesar los datos en un hilo separado
+            var trabajador = new Worker("008-worker.js");
+
+            // Envía los datos de la imagen al Worker para que los procese
+            trabajador.postMessage(datos.data);
+
+            // Define una función que se ejecutará cuando el Worker devuelva los datos procesados
+            trabajador.onmessage = function(misdatos) {
+                // Actualiza los datos de los píxeles del canvas con los datos devueltos por el Worker
+                for (let i = 0; i < datos.data.length; i++) {
+                    datos.data[i] = misdatos.data[i];
+                }
+
+                // Vuelve a dibujar los datos actualizados en el canvas
+                contexto.putImageData(datos, 0, 0);
+
+                // Calcula el tiempo que tardó el proceso en completarse
+                const tiempofinal = new Date(); // Obtiene la fecha y hora actuales después del procesamiento
+                const epochfinal = tiempofinal.getTime(); // Convierte la fecha en milisegundos desde el epoch
+                const resta = epochfinal - epochinicio; // Calcula la diferencia entre el tiempo final e inicial
+
+                // Imprime en la consola el tiempo que tardó en completarse el proceso
+                console.log("Esta operacion tarda en hacerse", resta, "milisegundos");
+            };
+        };
     </script>
   </body>
 </html>
+
+
+<!-- Explicación Detallada:
+Canvas:
+El <canvas> es el espacio donde se dibuja la imagen. Este código establece un lienzo de 2373 píxeles de ancho y 2048 píxeles de alto.
+
+Cálculo de Tiempo:
+Se registran los tiempos inicial y final para medir cuánto tarda el procesamiento. La diferencia (resta) se imprime en la consola.
+
+Carga de la Imagen:
+La imagen (foto1.JPG) se carga mediante el objeto Image. Una vez cargada (onload), se dibuja en el canvas usando drawImage.
+
+Obtención de Datos de la Imagen:
+getImageData extrae los datos de píxeles de una región del canvas (aquí desde (0, 0) hasta (2373, 500)). Los datos incluyen valores RGBA para cada píxel.
+
+Uso de Web Worker:
+Los datos de píxeles se envían al Worker (008-worker.js) para procesarlos en un hilo separado, evitando que la interfaz del navegador se congele.
+
+Actualización de Datos del Canvas:
+Una vez que el Worker devuelve los datos procesados (onmessage), estos se aplican al canvas mediante putImageData.
+
+Beneficios del Código:
+Optimización del Rendimiento:
+Utiliza Web Workers para manejar tareas pesadas sin bloquear el hilo principal.
+
+Métricas de Tiempo:
+Proporciona información sobre cuánto tiempo toma el proceso, útil para optimizar aún más el código. -->

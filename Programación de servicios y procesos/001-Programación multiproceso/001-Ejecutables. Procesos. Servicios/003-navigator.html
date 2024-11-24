@@ -2,16 +2,36 @@
 <html>
   <body>
     <script>
-      
-      const navegador = navigator;        // Instancio el objeto navigator
-      console.log(navegador);             // Lo saco por consola
-      const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
-      console.log("Tu ordenador tiene",nucleos,"núcleos")
-      
+      // Instancia el objeto `navigator`, que contiene información sobre el navegador y el sistema.
+      const navegador = navigator;
+
+      // Muestra el objeto `navigator` en la consola, permitiendo inspeccionar sus propiedades.
+      console.log(navegador);
+
+      // Obtiene el número de núcleos del procesador del dispositivo mediante la propiedad `hardwareConcurrency`.
+      const nucleos = navegador.hardwareConcurrency;
+
+      // Muestra en la consola cuántos núcleos tiene el procesador del dispositivo.
+      console.log("Tu ordenador tiene", nucleos, "núcleos");
+
+      // Intenta crear un nuevo objeto Worker, pero está incompleto porque falta la referencia al archivo de script.
       let trabajador = new Worker();
-      
-      
+
+      // NOTA: Este código generará un error porque el constructor `Worker()` requiere un argumento
+      // que indique el archivo JavaScript que ejecutará el worker. Ejemplo:
+      // let trabajador = new Worker("archivo-worker.js");
       
     </script>
   </body>
 </html>
+
+<!-- Explicación de los comentarios:
+Objeto navigator:
+
+El objeto navigator proporciona información del entorno, como la cantidad de núcleos de CPU, idioma, conexión a internet, entre otros.
+Propiedad hardwareConcurrency:
+
+Esta propiedad específica indica la cantidad de núcleos lógicos disponibles en el procesador, útil para optimizar el uso de Web Workers.
+Creación del Worker:
+
+La clase Worker se utiliza para crear un hilo de ejecución paralelo. El constructor necesita un archivo JavaScript para ejecutarse, el cual no está especificado aquí, causando un error al ejecutar el código. -->

@@ -2,21 +2,48 @@
 <html>
   <body>
     <script>
+      // Crea una nueva instancia del objeto Date para obtener la fecha y hora actuales.
+      let inicio = new Date();
       
-      let inicio = new Date();              // Nueva instancia del objeto Date
-      let epochinicio = inicio.getTime();   // Quiero saber el epoch desde 1 de enero 70
-      
-      let numero = 1.0000000054;            // Creo un número cercano a uno
-      let iteraciones = 10000000000;         // Define el numero de iteraciones de cálculo
-      for(let i = 0;i<iteraciones;i++){     // Arranco  un bucle for
-        numero *= 1.000000000076;           // Realizo una multiplicación 
+      // Obtiene el tiempo en formato epoch (milisegundos desde el 1 de enero de 1970) del momento de inicio.
+      let epochinicio = inicio.getTime();
+
+      // Inicializa un número cercano a 1 que será utilizado en el cálculo.
+      let numero = 1.0000000054;
+
+      // Define la cantidad de iteraciones que se ejecutarán en el bucle.
+      let iteraciones = 10000000000;
+
+      // Inicia un bucle for que se ejecutará la cantidad de veces definida en la variable 'iteraciones'.
+      for(let i = 0; i < iteraciones; i++) {
+        // Multiplica el número por un valor muy cercano a 1 en cada iteración.
+        numero *= 1.000000000076;
       }
-      
-      let final = new Date();             // Nueva instancia de Date
-      let epochfinal = final.getTime();   // Saco el epoch del final del programa
-      let resta = epochfinal - epochinicio; // Resto el final menos el inicio para saber la diferencia
-      console.log("La diferencia de tiempo ha sido de ",resta); // Mensaje por consola
-      
+
+      // Crea una nueva instancia del objeto Date para obtener la fecha y hora actuales tras el bucle.
+      let final = new Date();
+
+      // Obtiene el tiempo en formato epoch (milisegundos desde el 1 de enero de 1970) del momento final.
+      let epochfinal = final.getTime();
+
+      // Calcula la diferencia en milisegundos entre el momento de inicio y el momento final.
+      let resta = epochfinal - epochinicio;
+
+      // Muestra en la consola el tiempo transcurrido en milisegundos durante la ejecución del programa.
+      console.log("La diferencia de tiempo ha sido de ", resta);
     </script>
   </body>
 </html>
+
+
+<!-- 
+Explicación de cada bloque:
+Objeto Date Inicial: Se utiliza para capturar el momento exacto en que empieza la ejecución del programa.
+Epoch Inicial: Convierte el momento capturado en un formato que mide el tiempo en milisegundos desde el 1 de enero de 1970.
+Cálculo con un Número Inicial: Se utiliza un número cercano a 1 para ejecutar operaciones matemáticas repetitivas.
+Bucle Intensivo: Realiza cálculos simples (multiplicaciones) durante un número elevado de iteraciones, simulando una tarea intensiva.
+Objeto Date Final: Captura el momento exacto tras la finalización del bucle.
+Epoch Final: Convierte el momento final en el mismo formato que el inicial.
+Cálculo del Tiempo Transcurrido: Resta los dos valores para obtener el tiempo transcurrido durante la ejecución del bucle.
+Salida de Consola: Muestra el resultado en milisegundos, ayudando a medir la eficiencia o el tiempo requerido por el programa.
+ -->

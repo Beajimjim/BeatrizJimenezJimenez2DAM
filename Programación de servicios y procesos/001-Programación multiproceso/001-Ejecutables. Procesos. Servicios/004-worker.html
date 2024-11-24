@@ -2,16 +2,37 @@
 <html>
   <body>
     <script>
-      
-      const navegador = navigator;        // Instancio el objeto navigator
-      console.log(navegador);             // Lo saco por consola
-      const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
-      console.log("Tu ordenador tiene",nucleos,"núcleos")
-      
-      let trabajador = new Worker("004-worker.js");   // Creo una instancia de Worker
-      trabajador.postMessage("hola");                 // Le envío un mensaje    
-      
-      
+      // Instancia el objeto `navigator`, que proporciona información sobre el navegador y el sistema.
+      const navegador = navigator;
+
+      // Muestra el objeto `navigator` completo en la consola para inspeccionar sus propiedades.
+      console.log(navegador);
+
+      // Obtiene el número de núcleos lógicos del procesador del dispositivo usando `hardwareConcurrency`.
+      const nucleos = navegador.hardwareConcurrency;
+
+      // Muestra en la consola la cantidad de núcleos disponibles en el procesador.
+      console.log("Tu ordenador tiene", nucleos, "núcleos");
+
+      // Crea una nueva instancia de `Worker`, asignándole el archivo de script `004-worker.js` para ejecutar en segundo plano.
+      let trabajador = new Worker("004-worker.js");
+
+      // Envía un mensaje al Worker creado. En este caso, el mensaje es el texto "hola".
+      trabajador.postMessage("hola");
+
+      // NOTA: Para que este código funcione correctamente, el archivo `004-worker.js` debe estar en el mismo directorio
+      // y contener la lógica necesaria para recibir y procesar mensajes del hilo principal.
     </script>
   </body>
 </html>
+
+<!-- Explicación de las partes clave:
+Objeto navigator:
+
+Se utiliza para obtener información sobre el sistema, como el número de núcleos disponibles.
+Clase Worker:
+
+Permite ejecutar código JavaScript en un hilo separado del hilo principal del navegador, lo que evita bloquear la interfaz de usuario durante operaciones intensivas.
+Método postMessage:
+
+Este método envía datos al Worker para que los procese. En este caso, se envía el mensaje "hola". -->

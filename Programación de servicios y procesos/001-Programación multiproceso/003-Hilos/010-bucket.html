@@ -1,44 +1,67 @@
 <!doctype html>
 <html>
   <body>
+    <!-- Canvas donde se cargará y procesará la imagen -->
     <canvas id="lienzo1"></canvas>
     <script>
-       var x;
-       var y;
-       var bucket;
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 2373
-        lienzo.height = 2048                                    // Le pongo 1024 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "foto1.jpg";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          
-          bucket = 64
-          x = 0;
-          y = 0;
-               
-          trabajaMucho()
- 
-        }
-        
-        function trabajaMucho(){
-          datos1 = contexto.getImageData(x,y,bucket,bucket)        // Leo la primera cuarta parte en vertical de la imagen de la imagen (cargo  con una cuarta parte de lo que cargaba antes)
-          var trabajador = new Worker("009-worker.js");         // Creo una nueva instancia de un worker y lo pongo en el identificador llamado trabajador
-          trabajador.postMessage(datos1.data)                   // tomo los datos y se los envío al worker
-          ///////////////////////////////////////////////////// Y ahora me olvido porque yo ya le he enviado los datos al trabajador, y ya si eso el trabajador me dirá algo
-          trabajador.onmessage = function(misdatos){            // Cuando el trabajador finaliza me devuelve un mensaje
-            for(let i = 0;i<datos1.data.length;i++){              // tomo el array de datos que me da el worker
-              datos1.data[i] = misdatos.data[i]                 // Lo vuelco al array de datos de la imagen porque yo lo que quiero al final es una imagen
-            }
-            contexto.putImageData(datos1,x-64,0)                   // Esa imagen que he construido con los datos que me da el worker, pues la pongo en el canvas         
-           }
-           x+=bucket;
-           setTimeout(function(){
-               trabajaMucho()
-           },1000)
-          
+        // Declaración de variables globales
+        var x;        // Coordenada X del bloque que se está procesando
+        var y;        // Coordenada Y del bloque que se está procesando
+        var bucket;   // Tamaño del bloque (en píxeles) que se procesará
+
+        // Selección del lienzo y configuración de dimensiones
+        const lienzo = document.querySelector("#lienzo1"); // Selecciono el elemento <canvas> por su ID
+        lienzo.width = 2373; // Ancho del lienzo en píxeles
+        lienzo.height = 2048; // Alto del lienzo en píxeles
+        const contexto = lienzo.getContext("2d"); // Creo un contexto 2D para dibujar en el lienzo
+
+        // Crea un objeto de imagen y asigna la ruta de la imagen que se cargará
+        var imagen = new Image();
+        imagen.src = "foto1.jpg"; // Ruta de la imagen que se cargará
+
+        // Evento que se ejecuta cuando la imagen ha terminado de cargarse
+        imagen.onload = function() {
+            // Dibuja la imagen completa en el canvas
+            contexto.drawImage(imagen, 0, 0);
+
+            // Configuración inicial del tamaño de los bloques (bucket) y las coordenadas
+            bucket = 64; // Tamaño del bloque que se procesará (64x64 píxeles)
+            x = 0; // Coordenada X inicial
+            y = 0; // Coordenada Y inicial
+
+            // Llama a la función para comenzar el procesamiento de la imagen
+            trabajaMucho();
+        };
+
+        // Función que procesa la imagen en bloques pequeños
+        function trabajaMucho() {
+            // Obtiene los datos de píxeles de un bloque de la imagen
+            datos1 = contexto.getImageData(x, y, bucket, bucket); // Lee un bloque (bucket x bucket) desde las coordenadas (x, y)
+
+            // Crea un nuevo Worker para procesar los datos de forma independiente
+            var trabajador = new Worker("009-worker.js"); // Instancia un nuevo Worker desde el archivo "009-worker.js"
+            trabajador.postMessage(datos1.data); // Envía los datos del bloque al Worker para que los procese
+
+            // Define una función que se ejecutará cuando el Worker termine de procesar los datos
+            trabajador.onmessage = function(misdatos) {
+                // Itera sobre los datos procesados devueltos por el Worker
+                for (let i = 0; i < datos1.data.length; i++) {
+                    datos1.data[i] = misdatos.data[i]; // Actualiza los datos de píxeles con los valores procesados
+                }
+
+                // Vuelve a dibujar los datos procesados en el canvas
+                // Coloca el bloque procesado en las coordenadas correspondientes
+                contexto.putImageData(datos1, x - 64, 0);
+            };
+
+            // Actualiza la posición horizontal (X) para el siguiente bloque
+            x += bucket;
+
+            // Comprueba si hay más bloques por procesar
+            // Llama de nuevo a la función después de 1 segundo para evitar sobrecargar el navegador
+            setTimeout(function() {
+                trabajaMucho(); // Llama a la función para procesar el siguiente bloque
+            }, 1000); // Espera 1000 milisegundos (1 segundo)
         }
     </script>
   </body>

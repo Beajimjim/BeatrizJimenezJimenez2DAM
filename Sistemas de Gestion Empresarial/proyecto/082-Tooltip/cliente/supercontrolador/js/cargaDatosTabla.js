@@ -1,181 +1,216 @@
-/////////////////////////////////// CREO UNA FUNCIÓN PARA CARGAR DINÁMICAMENTE TABLAS /////////////////////////////////////////////
+/////////////////////////////////// FUNCIÓN PARA CARGAR DINÁMICAMENTE TABLAS /////////////////////////////////////////////
 
-function cargaDatosTabla(tabla){
-   let campoclave;                                                          // Creo  una variable que va a almacenar el nombre del campo que es clave primaria
-   /////////////////////////////////// LISTADO DE COLUMNAS DE TABLA /////////////////////////////////////////////
-    
-    fetch("../../servidor/?o=columnastabla&tabla="+tabla)                 // LLamo a un microservicio que me da la lista de tablas y le paso la tabla como parametro
+function cargaDatosTabla(tabla) {
+    let campoclave; // Variable para almacenar el nombre del campo que actúa como clave primaria.
+
+    /////////////////////////////////// OBTENER LISTADO DE COLUMNAS DE LA TABLA /////////////////////////////////////////////
+
+    // Llamada al servidor para obtener las columnas de la tabla.
+    fetch("../../servidor/?o=columnastabla&tabla=" + tabla)
         .then(response => {
-          return response.json();                                           // Quiero que el servidor me devuelva un json
+            return response.json(); // Se espera una respuesta en formato JSON.
         })
         .then(datos => {
-            columnas_tabla = []                                             // Vacía las columnas anteriores para cargar solo las nuevas
-            tipos_tabla = []																// Creo un array vacio para almacenar los tipos de dato de las colummnas de la tabla
-            claves_tabla = []																// Creo un array vacio para almacenar el tipo de clave de cada columna de la tabla
-            campos_busqueda = []															// Creo un array vacio para almacenar los input del buscador de la tabla
-            let cabeceras_tabla = document.querySelector("table thead tr"); // Selecciono donde tengo que poner las cabeceras en la tabla
-            cabeceras_tabla.innerHTML = ""                                  // Por si acaso hay columnas previamente cargadas, vacio la cabecera
-            datos.forEach(function(dato){                                   // PAra cada uno de los datos
-                let elemento = document.createElement("th")                 // Creo un elemento que es una cabecera de tabla
-                columnas_tabla.push(dato['Field'])                          // Al listado de columnas le añades la columna actual
-                 
-                elemento.textContent = dato['Field']                        // Su texto es el nombre del campo de la base de datos
-                campos_busqueda.push(document.createElement("input"))											// Creo un elemento de tipo input html
-                campos_busqueda[campos_busqueda.length-1].setAttribute("placeholder",dato['Field'] )	// A cada uno de los campos del buscador les pongo un placeholder
-                
-                claves_tabla.push(dato['Key'])										// Al array de claves le añado el valor de la clave que viene de la base de datos
-                
-                campos_busqueda[campos_busqueda.length-1].setAttribute("type",convierteTipoDato(dato['Type']) )
-                tipos_tabla.push(convierteTipoDato(dato['Type']))
-                
-                elemento.appendChild(campos_busqueda[campos_busqueda.length-1])											// En cada una de las cabeceras, pongo un campo input
-                cabeceras_tabla.appendChild(elemento)                       // Añado ese elemento a las cabeceras de la tabla
-                if(dato['Key'] == "PRI"){                                   // Si este campo es clave primaria
-                    campoclave = dato['Field']                              // en ese caso, recordamos cual es el nombre del campo que hace de clave primaria
-                }
-            })
-            let elemento = document.createElement("th") 							// Creo una columna mas en la tabla
-            elemento.textContent = "🔍"												// En la ultima cabecera de columna pongo la lupa
-            cabeceras_tabla.appendChild(elemento) 									// Lo añado a las cabeceras de la tabla
-            elemento.onclick = function(){											// Cuando haga click en la lupa
+            // Inicializar estructuras de datos para las columnas y tipos.
+            columnas_tabla = []; // Lista de columnas de la tabla.
+            tipos_tabla = []; // Tipos de datos de cada columna.
+            claves_tabla = []; // Claves primarias o foráneas.
+            campos_busqueda = []; // Campos de entrada para realizar búsquedas.
 
-            	mensaje = {}																// Creo un objeto vacio
-            	campos_busqueda.forEach(function(campo){							// Para cada uno de los input de busqueda
-            		let columna = campo.getAttribute("placeholder")				// Atrapo el nombre del campo
-            		let valor = campo.value												// Atrapo el valor del campo
-            		if(valor != ""){														// Si el campo no está vacio
-            			mensaje[columna] = valor										// Le añado el dato al objeto
-            		}
-            	})
-            	fetch("../../servidor/?o=buscarSimilar&tabla="+tabla, {		// Ahora realizo una peticion al servidor y le paso el objeto
-                          method: 'POST', 
-                          headers: {
-                            'Content-Type': 'application/json', 
-                          },
-                          body: JSON.stringify(mensaje), 
-                        })
-					  .then(response => {
-						 return response.json();                                                       // Quiero que el servidor me devuelva un json
-					  })
-					  .then(datos => {			  
-					  		pueblaTabla(datos,campoclave,tabla)									// Cuando el servidor me responde, pueblo la tabla con los datos que han venido
-					  })
-            }
-            //console.log(columnas_tabla);
-            
-                /////////////////////////////////// LISTADO DE COLUMNAS DE TABLA /////////////////////////////////////////////
-                let coleccioncampos = []                                                                // Creo una colección vacía de campos
-                let contiene_modal = document.querySelector("#contienemodal")                           // Selecciono el contenedor del modal
-                contiene_modal.innerHTML = "<h1>Formulario de inserción: "+tabla+"</h1>"                                                           // Si el modal contenía algo, lo vaćio
-                let seccion = document.createElement("section")
-                columnas_tabla.forEach(function(columna,index){                                               // PAra cada una de las columnas de la tabla
-                    let contenedor = document.createElement("div")
-                    let texto = document.createElement("p")
-                    texto.textContent = "Inserta un nuevo elemento para: "+columna+""
-                    contenedor.appendChild(texto)
-                    if(claves_tabla[index] != "MUL"){
-		                 coleccioncampos.push(document.createElement("input"))                               // Creo un campo input
-		                 coleccioncampos[coleccioncampos.length-1].setAttribute("type",tipos_tabla[index]) 
-		                                                          // Le pongo una leyenda al campo 
-		                coleccioncampos[coleccioncampos.length-1].setAttribute("placeholder",columna)                                                  // Lo añado al modal
-                    	contenedor.appendChild(coleccioncampos[coleccioncampos.length-1])                                                                            
-                    
-                    }else{
-                    		let selectElement = document.createElement("select");
+            // Seleccionar y limpiar el área de encabezados de la tabla.
+            let cabeceras_tabla = document.querySelector("table thead tr");
+            cabeceras_tabla.innerHTML = ""; // Vaciar las cabeceras existentes.
+
+            // Procesar cada columna recibida desde el servidor.
+            datos.forEach(function (dato) {
+                let elemento = document.createElement("th"); // Crear un elemento para la cabecera.
+                columnas_tabla.push(dato["Field"]); // Añadir el nombre del campo a la lista de columnas.
+
+                elemento.textContent = dato["Field"]; // Usar el nombre del campo como texto de la cabecera.
+
+                // Crear un campo de búsqueda para cada columna.
+                let inputBusqueda = document.createElement("input");
+                inputBusqueda.setAttribute("placeholder", dato["Field"]); // Placeholder con el nombre del campo.
+                inputBusqueda.setAttribute("type", convierteTipoDato(dato["Type"])); // Tipo de dato según el tipo del campo.
+                campos_busqueda.push(inputBusqueda); // Añadir a la lista de campos de búsqueda.
+
+                // Añadir los datos de clave y tipo de la columna.
+                claves_tabla.push(dato["Key"]); // Guardar si es clave primaria o foránea.
+                tipos_tabla.push(convierteTipoDato(dato["Type"])); // Guardar el tipo de dato.
+
+                // Insertar el campo de búsqueda en la cabecera de la tabla.
+                elemento.appendChild(inputBusqueda);
+                cabeceras_tabla.appendChild(elemento);
+
+                // Identificar si la columna es clave primaria.
+                if (dato["Key"] === "PRI") {
+                    campoclave = dato["Field"];
+                }
+            });
+
+            // Añadir una columna extra con un ícono de lupa para búsquedas.
+            let elemento = document.createElement("th");
+            elemento.textContent = "🔍";
+            cabeceras_tabla.appendChild(elemento);
+
+            // Evento para realizar la búsqueda cuando se hace clic en la lupa.
+            elemento.onclick = function () {
+                let mensaje = {}; // Objeto vacío para almacenar criterios de búsqueda.
+
+                // Recopilar valores de los campos de búsqueda.
+                campos_busqueda.forEach(function (campo) {
+                    let columna = campo.getAttribute("placeholder"); // Nombre del campo.
+                    let valor = campo.value; // Valor ingresado por el usuario.
+                    if (valor !== "") {
+                        mensaje[columna] = valor; // Añadir al objeto si el campo no está vacío.
+                    }
+                });
+
+                // Enviar los criterios de búsqueda al servidor.
+                fetch("../../servidor/?o=buscarSimilar&tabla=" + tabla, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(mensaje),
+                })
+                    .then(response => {
+                        return response.json(); // Respuesta en formato JSON.
+                    })
+                    .then(datos => {
+                        // Actualizar la tabla con los datos recibidos.
+                        pueblaTabla(datos, campoclave, tabla);
+                    });
+            };
+
+            /////////////////////////////////// CREAR FORMULARIO EN EL MODAL PARA INSERCIÓN /////////////////////////////////////////////
+
+            let coleccioncampos = []; // Lista de campos del formulario.
+            let contiene_modal = document.querySelector("#contienemodal"); // Contenedor del modal.
+
+            // Configurar el encabezado del formulario en el modal.
+            contiene_modal.innerHTML = "<h1>Formulario de inserción: " + tabla + "</h1>";
+
+            let seccion = document.createElement("section"); // Crear una sección para los campos.
+
+            // Crear campos para cada columna.
+            columnas_tabla.forEach(function (columna, index) {
+                let contenedor = document.createElement("div"); // Contenedor para cada campo.
+                let texto = document.createElement("p"); // Etiqueta con descripción.
+                texto.textContent = "Inserta un nuevo elemento para: " + columna;
+                contenedor.appendChild(texto);
+
+                if (claves_tabla[index] !== "MUL") {
+                    // Crear un campo de entrada estándar si no es clave foránea.
+                    let inputCampo = document.createElement("input");
+                    inputCampo.setAttribute("type", tipos_tabla[index]); // Tipo de dato.
+                    inputCampo.setAttribute("placeholder", columna); // Placeholder.
+                    coleccioncampos.push(inputCampo); // Añadir a la colección de campos.
+                    contenedor.appendChild(inputCampo); // Añadir al contenedor.
+                } else {
+                    // Crear un select si es una clave foránea.
+                    let selectElement = document.createElement("select");
                     coleccioncampos.push(selectElement);
 
+                    // Añadir una opción por defecto al select.
                     let defaultOption = document.createElement("option");
                     defaultOption.textContent = "Selecciona una opción:";
                     selectElement.appendChild(defaultOption);
 
+                    // Cargar opciones dinámicamente desde el servidor.
                     fetchOptionsForSelect(selectElement, columna);
                     selectElement.setAttribute("placeholder", columna);
-                    
                     contenedor.appendChild(selectElement);
-                    selectjv(selectElement)
-                    }  
-                     
-                    /*
-                    try{
-                    	
-                    }catch(Error){
-                    	console.log("no aplica")
+                    selectjv(selectElement); // Personalizar el select.
+                }
+
+                // Añadir el campo al formulario.
+                seccion.appendChild(contenedor);
+            });
+
+            contiene_modal.appendChild(seccion);
+
+            // Crear botón de envío para el formulario.
+            let boton_enviar = document.createElement("button");
+            boton_enviar.textContent = "Enviar"; // Texto del botón.
+
+            // Evento para enviar el formulario.
+            boton_enviar.onclick = function () {
+                let formData = new FormData(); // Crear objeto FormData para envío.
+
+                // Recopilar datos de los campos del formulario.
+                coleccioncampos.forEach(function (campo) {
+                    if (campo.getAttribute("placeholder") !== "Identificador") {
+                        if (campo.getAttribute("type") === "file") {
+                            formData.append(campo.getAttribute("placeholder"), campo.files[0]);
+                        } else {
+                            formData.append(campo.getAttribute("placeholder"), campo.value);
+                        }
                     }
-                    */
-                    seccion.appendChild(contenedor)                                                    // Lo añado al modal
-                		
-                	})
-                contiene_modal.appendChild(seccion) 
-                
-                let boton_enviar = document.createElement("button")                                     // Por último creo un boton
-                boton_enviar.textContent = "Enviar"                                                     // Le pongo texto al boton
-                boton_enviar.onclick = function() {
-						 console.log("Vamos a procesar el formulario");
-						 console.log(coleccioncampos);
-						 let formData = new FormData();
+                });
 
-						 coleccioncampos.forEach(function(campo) {
-							  if (campo.getAttribute('placeholder') !== "Identificador") {
-									if (campo.getAttribute('type') === "file") {
-										 console.log("ok veo un archivo");
-										 let archivo = campo.files[0];
-										 formData.append(campo.getAttribute('placeholder'), archivo);
-									} else {
-										 formData.append(campo.getAttribute('placeholder'), campo.value);
-									}
-							  }
-						 });
-
-						 fetch("../../servidor/?o=insertar&tabla=" + tabla, {
-							  method: 'POST',
-							  body: formData
-						 })
-						 .then(function(response) {
-							  return response.text();
-						 })
-						 .then(function(datos) {
-							  console.log(datos);
-							  document.querySelector("#modal").classList.remove("aparece");
-							  document.querySelector("#modal").classList.add("desaparece");
-							  setTimeout(function() {
-									document.querySelector("#modal").style.display = "none";
-							  }, 1000);
-						 });
-					};
-                contienemodal.appendChild(boton_enviar)                                                 // Añado el boton al modal
-                /////////////////////////////////// LISTADO DE COLUMNAS DE TABLA /////////////////////////////////////////////
-            
-            /////////////////////////////////// CONTENIDO DE LA TABLA /////////////////////////////////////////////
- 
-            fetch("../../servidor/?o=tabla&tabla="+tabla)                            // LLamo a un microservicio que me da la lista de tablas y le paso la tabla como parametro
-                .then(response => {
-                  return response.json();                                                   // Quiero que el servidor me devuelva un json
+                // Enviar los datos al servidor.
+                fetch("../../servidor/?o=insertar&tabla=" + tabla, {
+                    method: "POST",
+                    body: formData,
                 })
+                    .then(response => response.text())
+                    .then(datos => {
+                        console.log(datos);
+                        // Cerrar el modal tras completar la inserción.
+                        document.querySelector("#modal").classList.remove("aparece");
+                        document.querySelector("#modal").classList.add("desaparece");
+                        setTimeout(() => {
+                            document.querySelector("#modal").style.display = "none";
+                        }, 1000);
+                    });
+            };
+
+            contiene_modal.appendChild(boton_enviar); // Añadir el botón al modal.
+
+            /////////////////////////////////// CARGAR CONTENIDO DE LA TABLA /////////////////////////////////////////////
+
+            // Llamada al servidor para obtener los datos de la tabla.
+            fetch("../../servidor/?o=tabla&tabla=" + tabla)
+                .then(response => response.json())
                 .then(datos => {
-                    pueblaTabla(datos,campoclave,tabla)
-                })
-           
-            /////////////////////////////////// CONTENIDO DE LA TABLA /////////////////////////////////////////////
-            
-            
-            /////////////////////////////////// CONTENIDO DE LA VENTANA MODAL /////////////////////////////////////////////
-        })
-    
- }
- 
- /////////////////////////////////// CREO UNA FUNCIÓN PARA CARGAR DINÁMICAMENTE TABLAS /////////////////////////////////////////////
- 
- 
- 
- function fetchOptionsForSelect(selectElement, column) {
+                    // Mostrar los datos en la tabla.
+                    pueblaTabla(datos, campoclave, tabla);
+                });
+        });
+}
+
+/////////////////////////////////// FUNCIÓN PARA CARGAR OPCIONES EN UN SELECT /////////////////////////////////////////////
+
+function fetchOptionsForSelect(selectElement, column) {
+    // Llamar al servidor para obtener datos relacionados con la tabla indicada
+    // El nombre de la tabla se extrae del nombre de la columna antes del guion bajo ("_").
     fetch("../../servidor/?o=tabla&tabla=" + column.split("_")[0])
-        .then(response => response.json())
+        .then(response => response.json()) // Convertir la respuesta del servidor a formato JSON.
         .then(datos => {
-            datos.forEach(function(dato) {
+            // Iterar sobre los datos recibidos del servidor.
+            datos.forEach(function (dato) {
+                // Crear un nuevo elemento de opción (<option>) para el select.
                 let option = document.createElement("option");
-                option.value = dato['Identificador'];
-                option.textContent = Object.values(dato).join(' - ');
+                
+                // Establecer el valor de la opción con el identificador único del dato.
+                option.value = dato["Identificador"];
+                
+                // Establecer el texto visible de la opción concatenando los valores del dato.
+                option.textContent = Object.values(dato).join(" - ");
+                
+                // Añadir la opción al elemento select proporcionado.
                 selectElement.appendChild(option);
             });
         });
 }
+
+
+
+// Resumen de Funcionalidad
+// Carga dinámica de columnas y datos de la tabla desde el servidor.
+// Generación de un formulario de inserción dinámico en un modal.
+// Soporte para búsquedas dinámicas en la tabla.
+// Inserción de datos en la base de datos mediante un formulario.
+// Creación de select dinámicos con opciones relacionadas.
+// Este código automatiza la gestión de tablas en una interfaz web interactiva.

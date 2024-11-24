@@ -1,24 +1,61 @@
 <!doctype html>
-<html lang="es">
+<html lang="es"> <!-- Especifica que el documento es HTML5 y el idioma principal es español -->
   <head>
-    <title>BJJ ERP</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="estilo.css">
-    <script src="comportamiento.js"></script>
+    <title>BJJ ERP</title> <!-- Título de la página que aparece en la pestaña del navegador -->
+    <meta charset="utf-8"> <!-- Configuración del juego de caracteres en UTF-8 para admitir caracteres especiales -->
+    <link rel="stylesheet" href="estilo.css"> <!-- Enlace al archivo de estilos CSS externo -->
+    <script src="comportamiento.js"></script> <!-- Enlace al archivo de JavaScript externo para funcionalidades -->
   </head>
   <body>
     <header>
-      <img src="../img/logoLogin.png" id="logo">
+      <!-- Encabezado de la página -->
+      <img src="../img/logoLogin.png" id="logo"> <!-- Logotipo que se muestra en la cabecera -->
     </header>
     <main>
-      
-      
+      <!-- Contenedor principal donde se añadirán dinámicamente las aplicaciones -->
     </main>
     <template id="plantilla_aplicacion">
+      <!-- Plantilla para generar elementos de aplicación dinámicamente -->
       <div class="aplicacion">
-        <div class="icono"></div>
-        <p>Plantilla</p>
+        <div class="icono"></div> <!-- Contenedor para el ícono de la aplicación -->
+        <p>Plantilla</p> <!-- Texto de ejemplo que se reemplazará dinámicamente -->
       </div>
     </template>
   </body>
 </html>
+
+<!-- Explicación por secciones
+Declaración inicial:
+
+<!doctype html>: Indica que el documento es HTML5.
+<html lang="es">: Especifica que el contenido del documento está en español, lo que ayuda con la accesibilidad y los motores de búsqueda.
+<head>:
+
+Contiene metadatos sobre el documento:
+<title>: Define el título que aparece en la pestaña del navegador.
+<meta charset="utf-8">: Configura el juego de caracteres para admitir todos los caracteres del idioma español.
+<link rel="stylesheet" href="estilo.css">: Enlaza un archivo CSS externo para aplicar estilos al documento.
+<script src="comportamiento.js"></script>: Enlaza un archivo JavaScript externo que manejará el comportamiento dinámico de la página.
+<body>:
+
+Contiene el contenido principal visible para el usuario.
+
+<header>:
+
+Incluye el logotipo de la aplicación, referenciado por id="logo".
+<main>:
+
+Contenedor principal vacío que se llenará dinámicamente con las aplicaciones generadas desde el archivo JavaScript.
+<template>:
+
+Plantilla HTML utilizada como base para generar elementos dinámicos.
+Contiene una estructura con:
+Un contenedor principal (<div class="aplicacion">) que representa una aplicación.
+Un subcontenedor para el ícono (<div class="icono"></div>).
+Un párrafo con texto de ejemplo (<p>Plantilla</p>), que será reemplazado dinámicamente con datos.
+Propósito
+Este código es la base para una interfaz dinámica donde:
+
+Se carga una lista de aplicaciones en el contenedor <main>.
+Cada aplicación se genera a partir de la plantilla definida en <template>.
+Los estilos y comportamientos adicionales se gestionan desde los archivos externos estilo.css y comportamiento.js. -->

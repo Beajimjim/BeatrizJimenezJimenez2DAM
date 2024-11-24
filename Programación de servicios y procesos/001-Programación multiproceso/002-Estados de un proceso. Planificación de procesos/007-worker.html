@@ -1,64 +1,111 @@
 <!doctype html>
+<!-- Declara que este documento utiliza HTML5. -->
 <html>
   <body>
+    <!-- Crea un elemento <canvas> para dibujar la imagen. También incluye un texto de respaldo ("hola") por si el navegador no soporta canvas. -->
     <canvas id="lienzo1">hola</canvas>    
+
+    <!-- Crea un botón que aplicará el efecto negativo a la imagen cuando sea clicado. -->
     <button id="activarWorker">Aplicar Negativo</button>
+
+    <!-- Crea un botón que aplicará el efecto sepia a la imagen cuando sea clicado. -->
     <button id="activarSepia">Aplicar Sepia</button>
+
     <script>
-        const tiempoinicio = new Date()
-        const epochinicio = tiempoinicio.getTime()
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 2373
-        lienzo.height = 2048                                   // Le pongo 4000 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "foto1.JPG";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)   
-         
-         //////////////////////////CREAMOS DOS FUNCIONES PARA QUE EL WORKER SE EJECUTE CON UN BOTON Y NOS OFREZCA DOS EFECTOS DISTINTOS///////////////////////////
+        // Obtiene la fecha y hora actual y la guarda en la variable "tiempoinicio".
+        const tiempoinicio = new Date();
 
+        // Convierte la fecha inicial a milisegundos desde el 1 de enero de 1970.
+        const epochinicio = tiempoinicio.getTime();
 
-          document.getElementById("activarWorker").onclick = function() {                   // Pinto la imagen
-          var datosNegativo = contexto.getImageData(0,0,lienzo.width,lienzo.height)         // Leo los datos a la memoria
-          var trabajador = new Worker("calculosAWorker.js");
-          trabajador.postMessage({ data: datosNegativo.data, effect: 'negative' });         // Envio los datos y el efecto. En este caso lo cambiamos a negativo
+        // Selecciona el elemento <canvas> por su id y lo guarda en la variable "lienzo".
+        const lienzo = document.querySelector("#lienzo1");
 
-          trabajador.onmessage = function(misdatos){
-            for(let i = 0;i<datosNegativo.data.length;i++){
-              datosNegativo.data[i] = misdatos.data[i]
-            }
-            //console.log(datos.data)
-            contexto.putImageData(datosNegativo,0,0)                                          // Pego los datos en una imagen en el canvas
-            const tiempofinal = new Date()
-            const epochfinal = tiempofinal.getTime()
-            const resta = epochfinal - epochinicio;
-            console.log("Esta operacion tarda en hacerse",resta,"milisegundos")
+        // Establece el ancho del lienzo en 2373 píxeles.
+        lienzo.width = 2373;
+
+        // Establece la altura del lienzo en 2048 píxeles.
+        lienzo.height = 2048;
+
+        // Obtiene el contexto de renderizado 2D del lienzo.
+        const contexto = lienzo.getContext("2d");
+
+        // Crea un objeto de tipo Image para cargar una imagen en memoria.
+        var imagen = new Image();
+
+        // Asigna la ruta de la imagen que se quiere cargar.
+        imagen.src = "foto1.jpg";
+
+        // Define una función que se ejecutará automáticamente una vez que la imagen haya terminado de cargarse.
+        imagen.onload = function() {                             
+
+          // Dibuja la imagen cargada en el lienzo, posicionándola en (0, 0).
+          contexto.drawImage(imagen, 0, 0);
+
+          // CONFIGURAMOS LAS FUNCIONES PARA APLICAR EFECTOS MEDIANTE WORKERS
+
+          // Función para aplicar el efecto negativo al hacer clic en el botón correspondiente.
+          document.getElementById("activarWorker").onclick = function() {
+
+            // Obtiene los datos de los píxeles de la imagen desde el lienzo.
+            var datosNegativo = contexto.getImageData(0, 0, lienzo.width, lienzo.height);
+
+            // Crea un nuevo Worker para realizar los cálculos en segundo plano.
+            var trabajador = new Worker("calculosAWorker.js");
+
+            // Envía los datos de la imagen y el efecto deseado ("negative") al Worker.
+            trabajador.postMessage({ data: datosNegativo.data, effect: 'negative' });
+
+            // Escucha los mensajes que el Worker envía de vuelta.
+            trabajador.onmessage = function(misdatos) {
+
+              // Recorre los datos recibidos del Worker y los actualiza en el lienzo.
+              for (let i = 0; i < datosNegativo.data.length; i++) {
+                datosNegativo.data[i] = misdatos.data[i];
+              }
+
+              // Vuelve a colocar los datos procesados (efecto negativo) en el lienzo.
+              contexto.putImageData(datosNegativo, 0, 0);
+
+              // Calcula y muestra en la consola cuánto tiempo tomó la operación.
+              const tiempofinal = new Date();
+              const epochfinal = tiempofinal.getTime();
+              const resta = epochfinal - epochinicio;
+              console.log("Esta operación tarda en hacerse", resta, "milisegundos");
+            };
+          };
+
+          // Función para aplicar el efecto sepia al hacer clic en el botón correspondiente.
+          document.getElementById("activarSepia").onclick = function() {
+
+            // Obtiene los datos de los píxeles de la imagen desde el lienzo.
+            var datosSepia = contexto.getImageData(0, 0, lienzo.width, lienzo.height);
+
+            // Crea un nuevo Worker para realizar los cálculos en segundo plano.
+            var trabajador = new Worker("calculosAWorker.js");
+
+            // Envía los datos de la imagen y el efecto deseado ("sepia") al Worker.
+            trabajador.postMessage({ data: datosSepia.data, effect: 'sepia' });
+
+            // Escucha los mensajes que el Worker envía de vuelta.
+            trabajador.onmessage = function(misdatos) {
+
+              // Recorre los datos recibidos del Worker y los actualiza en el lienzo.
+              for (let i = 0; i < datosSepia.data.length; i++) {
+                datosSepia.data[i] = misdatos.data[i];
+              }
+
+              // Vuelve a colocar los datos procesados (efecto sepia) en el lienzo.
+              contexto.putImageData(datosSepia, 0, 0);
+
+              // Calcula y muestra en la consola cuánto tiempo tomó la operación.
+              const tiempofinal = new Date();
+              const epochfinal = tiempofinal.getTime();
+              const resta = epochfinal - epochinicio;
+              console.log("Esta operación tarda en hacerse", resta, "milisegundos");
+            };
           };
         };
-
-
-        document.getElementById("activarSepia").onclick = function() {
-            var datosSepia  = contexto.getImageData(0, 0, lienzo.width, lienzo.height);                     // Leo los datos
-            var trabajador = new Worker("calculosAWorker.js");                                              // Worker para sepia
-            trabajador.postMessage({ data: datosSepia.data, effect: 'sepia' });                             // Envio los datos y el efecto. En este caso lo cambiamos a sepia       
-            
-            trabajador.onmessage = function(misdatos) {
-                for (let i = 0; i < datosSepia.data.length; i++) {
-                  datosSepia.data[i] = misdatos.data[i];                                                    // Actualizo los datos de la imagen
-                }
-                contexto.putImageData(datosSepia, 0, 0);                                                    // Pego los datos en el canvas
-                const tiempofinal = new Date();
-                const epochfinal = tiempofinal.getTime();
-                const resta = epochfinal - epochinicio;
-                console.log("Esta operación tarda en hacerse", resta, "milisegundos");
-            };
-        };
-
-       
-      };
     </script>
-   
-  
-    
+  </body>
 </html>

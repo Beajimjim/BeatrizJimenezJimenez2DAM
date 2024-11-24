@@ -2,12 +2,27 @@
 <html>
   <body>
     <script>
+      // Inicializa una variable con un número inicial.
       let numero = 1.0000000054;
+
+      // Define el número de iteraciones que se realizarán en el bucle.
       let iteraciones = 10000000000;
-      for(let i = 0;i<iteraciones;i++){
+
+      // Ejecuta un bucle para realizar un cálculo intensivo.
+      for(let i = 0; i < iteraciones; i++) {
+        // Multiplica el número por un valor muy cercano a 1 en cada iteración.
         numero *= 1.000000000076;
       }
+
+      // Muestra un mensaje en la consola al finalizar el bucle.
       console.log("finalizado");
     </script>
   </body>
 </html>
+
+
+<!-- Explicación de los comentarios:
+Inicialización: La variable numero se define con un valor inicial que será utilizado en las operaciones matemáticas.
+Iteraciones: Se define una cantidad extremadamente alta de iteraciones (10 mil millones), lo que simula una carga intensiva para el sistema.
+Cálculo en Bucle: Dentro del bucle, numero se multiplica repetidamente por un valor ligeramente mayor a 1, acumulando un cambio exponencial muy pequeño en cada paso.
+Mensaje Final: Una vez que el bucle termina, el mensaje "finalizado" se imprime en la consola para indicar que la operación ha concluido. -->

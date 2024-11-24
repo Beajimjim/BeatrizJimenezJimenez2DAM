@@ -1,38 +1,96 @@
 <!doctype html>
+<!-- Declara que este documento está escrito en HTML5. -->
 <html>
   <body>
+    <!-- Crea un lienzo HTML con el id "lienzo1". Será utilizado para dibujar imágenes mediante JavaScript. -->
     <canvas id="lienzo1"></canvas>
     <script>
-        const tiempoinicio = new Date()
-        const epochinicio = tiempoinicio.getTime()
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 2373
-        lienzo.height = 2048                                  // Le pongo 4000 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "foto.JPG";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          var datos = contexto.getImageData(0,0,2373,2048)      // Leo los datos a la memoria
-          for(let i = 0;i<datos.data.length;i+=4){              // Recorro cada pixel
-            let c = datos.data                                  // Cargo los datos de ese pixel
-            for(let i = 0; i<100;i++){                      // Fuerzo miles de ćalculos más para apretar al procesador
-              c[i] *= 1.00000000045
-              c[i+1] *= 1.00000000045
-              c[i+2] *= 1.00000000045
+        // Obtiene la fecha y hora actual y la guarda en la variable "tiempoinicio".
+        const tiempoinicio = new Date();
+
+        // Convierte la fecha inicial a milisegundos desde el 1 de enero de 1970 (epoch).
+        const epochinicio = tiempoinicio.getTime();
+
+        // Selecciona el elemento <canvas> en el DOM usando su id y lo guarda en "lienzo".
+        const lienzo = document.querySelector("#lienzo1");      
+
+        // Establece el ancho del lienzo en 2373 píxeles.
+        lienzo.width = 2373;
+
+        // Establece la altura del lienzo en 2048 píxeles.
+        lienzo.height = 2048;                                  
+
+        // Obtiene el contexto de renderizado 2D del lienzo para dibujar.
+        const contexto = lienzo.getContext("2d");              
+
+        // Crea un objeto de tipo Image para cargar una imagen.
+        var imagen = new Image();
+
+        // Establece la ruta de la imagen que se desea cargar.
+        imagen.src = "foto.JPG";
+
+        // Define una función que se ejecutará automáticamente una vez que la imagen se haya cargado por completo.
+        imagen.onload = function() {                           
+
+          // Dibuja la imagen cargada en el lienzo, posicionándola en las coordenadas (0, 0).
+          contexto.drawImage(imagen, 0, 0);
+
+          // Obtiene los datos de los píxeles de la imagen en el área especificada (todo el lienzo).
+          var datos = contexto.getImageData(0, 0, 2373, 2048);
+
+          // Itera sobre los datos de cada píxel. Cada píxel tiene 4 valores (rojo, verde, azul y alfa).
+          for (let i = 0; i < datos.data.length; i += 4) {
+
+            // Almacena los valores de los datos de los píxeles para manipularlos.
+            let c = datos.data;
+
+            // Fuerza cálculos adicionales innecesarios para sobrecargar el procesador.
+            for (let j = 0; j < 100; j++) {                   
+              c[i] *= 1.00000000045;          // Modifica el componente rojo con un cálculo minúsculo.
+              c[i+1] *= 1.00000000045;        // Modifica el componente verde de forma similar.
+              c[i+2] *= 1.00000000045;        // Modifica el componente azul con el mismo factor.
             }
-            let gris = Math.round((c[i] + c[i+1] + c[i+2])/3)   // Saco el promedio
-            
-            datos.data[i] = gris;                               // actualizo el color rojo para que sea gris
-            datos.data[i+1] = gris;                             // actualizo el color verde para que sea gris
-            datos.data[i+2] = gris;                             // actualizo el color azul para que sea gris
+
+            // Calcula el valor promedio de los colores rojo, verde y azul para convertir el píxel a escala de grises.
+            let gris = Math.round((c[i] + c[i+1] + c[i+2]) / 3);
+
+            // Actualiza el componente rojo del píxel con el valor en escala de grises.
+            datos.data[i] = gris;
+
+            // Actualiza el componente verde con el mismo valor de gris.
+            datos.data[i+1] = gris;
+
+            // Actualiza el componente azul con el mismo valor de gris.
+            datos.data[i+2] = gris;
           }
-          contexto.putImageData(datos,0,0)                      // Pego los datos en una imagen en el canvas
-          const tiempofinal = new Date()
-          const epochfinal = tiempofinal.getTime()
+
+          // Vuelve a colocar los datos modificados (en escala de grises) en el lienzo.
+          contexto.putImageData(datos, 0, 0);
+
+          // Obtiene la fecha y hora actual una vez que la operación ha finalizado.
+          const tiempofinal = new Date();
+
+          // Convierte la fecha final a milisegundos desde el 1 de enero de 1970.
+          const epochfinal = tiempofinal.getTime();
+
+          // Calcula la diferencia entre el tiempo inicial y el final para medir la duración de la operación.
           const resta = epochfinal - epochinicio;
-          console.log("Esta operacion tarda en hacerse",resta,"milisegundos")
+
+          // Muestra en la consola cuánto tiempo tomó realizar la operación.
+          console.log("Esta operación tarda en hacerse", resta, "milisegundos");
         }
     </script>
   </body>
 </html>
+
+
+<!-- Resumen de cambios y funcionamiento:
+Cálculos extra en el bucle interno: El bloque for anidado fuerza múltiples cálculos por cada píxel. Esto simula una mayor carga en el procesador.
+Cálculo de escala de grises: Convierte la imagen a tonos grises sumando los valores de los colores y promediándolos.
+Medición de tiempo: Registra cuánto tiempo tomó cargar, procesar y manipular los datos de la imagen. Este tiempo es calculado desde que el script comenzó hasta que se completó la manipulación.
+
+
+
+
+
+ -->

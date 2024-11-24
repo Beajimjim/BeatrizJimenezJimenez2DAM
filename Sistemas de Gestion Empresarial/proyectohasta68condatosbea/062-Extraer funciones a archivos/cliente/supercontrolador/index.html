@@ -1,0 +1,57 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Lateral a Pantalla Completa</title>
+    <link rel="stylesheet" href="estilo.css">  
+    <script src="js/poblarMenuNavegacion.js"></script>
+    <script src="js/pueblaTabla.js"></script>
+    <script src="js/cargaDatosTabla.js"></script> 
+    <script src="comportamiento.js"></script> 
+</head>
+<body>
+    <input type="checkbox" id="menu-toggle" class="menu-toggle">
+    <div class="sidebar">
+        <label for="menu-toggle" class="close-btn">&times;</label>
+        <h2>Menú</h2>      
+          <nav>
+            <ul>
+              
+          </ul>
+          </nav>           
+    </div>
+    <div class="content">
+      <label for="menu-toggle" class="open-btn">
+          <div class="hamburger-icon"></div>
+      </label>
+      <div class="back-button">
+        <a href="../escritorio/index.html" class="back-arrow"> Volver</a>
+    </div>      
+  </div>
+    <main>
+      <section>
+        <button id="insertar">+</button>
+        <div class="titulotabla">
+          <h5>Clientes</h5>
+          <p>En esta tabla podremos insertar a los clientes</p>
+        </div>
+        <table class="table" >
+          <thead>
+            <tr>
+              
+            </tr>
+          </thead>
+          <tbody>
+            
+          </tbody>
+        </table>
+      </section>
+    </main>   
+    <div id="modal">
+      <div id="contienemodal"></div>
+    </div>    <!-- Es una ventana emergente que podemos usar para lo que queramos --> 
+</body>
+</html>

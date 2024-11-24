@@ -5,22 +5,32 @@
   <body>
     <main>
       <section></section>
+      <!-- Campo de entrada donde el usuario puede escribir texto -->
       <input id="mensaje">
     </main>
     <script>
+      // Define una función llamada `bucle` que realiza una solicitud periódica al servidor
       function bucle(){
+        // Utiliza la función fetch para realizar una solicitud GET a la URL proporcionada
         fetch("http://192.168.1.151:5001/dame")
         .then(function(response){
-          return response.json()
+          // Convierte la respuesta del servidor (en formato JSON) a un objeto JavaScript
+          return response.json();
         })
         .then(function(datos){
-          console.log(datos)
-        })
-        clearTimeout(temporizador)
-        temporizador = setTimeout("bucle()",1000)
+          // Imprime los datos recibidos en la consola del navegador
+          console.log(datos);
+        });
+
+        // Cancela cualquier temporizador anterior para evitar que se acumulen múltiples llamados
+        clearTimeout(temporizador);
+        
+        // Configura un nuevo temporizador para llamar a la función `bucle` después de 1 segundo
+        temporizador = setTimeout("bucle()", 1000);
       }
       
-      var temporizador = setTimeout("bucle()",1000)
+      // Inicializa un temporizador que ejecuta la función `bucle` después de 1 segundo al cargar la página
+      var temporizador = setTimeout("bucle()", 1000);
     </script>
   </body>
 </html>

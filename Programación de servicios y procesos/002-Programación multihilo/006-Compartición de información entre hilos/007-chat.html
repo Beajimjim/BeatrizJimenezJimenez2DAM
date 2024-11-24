@@ -5,16 +5,21 @@
   <body>
     <main>
       <section></section>
+      <!-- Campo de entrada de texto donde el usuario puede escribir mensajes -->
       <input id="mensaje">
     </main>
     <script>
+      // Función recursiva que se ejecutará periódicamente
       function bucle(){
+        // Detiene cualquier temporizador anterior configurado por `setTimeout` para evitar múltiples llamadas superpuestas
+        clearTimeout(temporizador);
         
-        clearTimeout(temporizador)
-        temporizador = setTimeout("bucle()",1000)
+        // Configura un nuevo temporizador que ejecutará esta misma función después de 1 segundo
+        temporizador = setTimeout("bucle()", 1000);
       }
       
-      var temporizador = setTimeout("bucle()",1000)
+      // Declara un temporizador global y lo inicia, llamando a la función `bucle` después de 1 segundo
+      var temporizador = setTimeout("bucle()", 1000);
     </script>
   </body>
 </html>

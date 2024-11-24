@@ -1,266 +1,210 @@
 <?php
 
-	class conexionDB{																													// Creo una nueva clase
-		
-			private $servidor;																										// creo una serie de propiedades privadas
-			private $usuario;																											// 
-			private $contrasena;																									// 
-			private $basededatos;																									// 
-			private $conexion;																										// 
-			
-			public function __construct() {																				// Creo un constructor
-				  $this->servidor = "localhost";																			// Le doy los datos de acceso a la base de datos
-				  $this->usuario = "crimson";																		// 
-				  $this->contrasena = "crimson";																	// 
-				  $this->basededatos = "crimson";																// 
-				  
-				  $this->conexion = mysqli_connect(
-							$this->servidor, 
-							$this->usuario, 
-							$this->contrasena, 
-							$this->basededatos
-						);																															// Establezco una conexión con la base de datos
-			 }
-			public function buscar($tabla,$datos){
-				$peticion = "SELECT * FROM ".$tabla." WHERE ";
-				foreach($datos as $clave=>$valor){
-					$peticion .= $clave."='".$valor."' AND "; 
-				}
-				$peticion .= " 1;";
-				//echo $peticion;
-				
-				
-				$resultado = mysqli_query($this->conexion , $peticion);
-				$retorno = [];
-				while ($fila = mysqli_fetch_assoc($resultado)) {										// Recupero los datos del servidor
-					$retorno[] = $fila;																			// Hago un push encubierto a las restricciones
-				}
-				$json = json_encode($retorno, JSON_PRETTY_PRINT);							// Lo codifico como json
-				return $json;	
-			}
-			
-			public function buscarSimilar($tabla,$datos){
-				$peticion = "SELECT * FROM ".$tabla." WHERE ";
-				foreach($datos as $clave=>$valor){
-					$peticion .= $clave." LIKE '%".$valor."%' AND "; 
-				}
-				$peticion .= " 1;";
-				//echo $peticion;
-				
-				
-				$resultado = mysqli_query($this->conexion , $peticion);
-				$retorno = [];
-				while ($fila = mysqli_fetch_assoc($resultado)) {										// Recupero los datos del servidor
-					$retorno[] = $fila;																			// Hago un push encubierto a las restricciones
-				}
-				$json = json_encode($retorno, JSON_PRETTY_PRINT);							// Lo codifico como json
-				return $json;	
-			}
-			
-			public function seleccionaTabla($tabla){													// Creo un metodo de seleccion
-				$query = "SELECT 
-											*
-									FROM 
-											information_schema.key_column_usage
-									WHERE 
-											table_name = '".$tabla."'
-											AND
-											REFERENCED_TABLE_NAME IS NOT NULL
-											;";											// Formateo una consulta SQL para ver qué campos tienen restricciones
-				
-				$result = mysqli_query($this->conexion , $query);								// Ejecuto la consulta contra la base de datos	
-				$restricciones = [];																						// Creo un array vacio para guardar las restricciones
-				while ($row = mysqli_fetch_assoc($result)) {										// Recupero los datos del servidor
-					$restricciones[] = $row;																			// Hago un push encubierto a las restricciones
-				}
-				
-				//var_dump($restricciones);																				// Las debugeo en pantalla
-				
-				$query = "SELECT * FROM ".$tabla.";";														// Creo la petición dinámica
-				$result = mysqli_query($this->conexion , $query);								// Ejecuto la peticion
-				$resultado = [];																								// Creo un array vacio
-				while ($row = mysqli_fetch_assoc($result)) {										// PAra cada uno de los registros
-						
-						//$resultado[] = $row;																			// Los añado al array
-						$fila = [];																									// Creo el conjunto de datos para cada fila
-						foreach($row as $clave=>$valor){														// PAra cada una de las columnas
-							$identificador = 1;
-							$pasas = true;																						// En principio asumimos que no hay restriccion
-							foreach($restricciones as $restriccion){									// Para cada una de las restricciones
-								if($clave == "Identificador"){
-									$identificador = $valor;
-								}
-								if($clave == $restriccion["COLUMN_NAME"]){							// En el caso de que se detecte que esta columna forma parte de las restricciones
-									
-									$query2 = "
-										SELECT * 
-										FROM ".$restriccion["REFERENCED_TABLE_NAME"]."
-										WHERE Identificador = ".$identificador."
-									;";
-									$result2 = mysqli_query($this->conexion , $query2);
-									$cadena = "";
-									while ($row2 = mysqli_fetch_assoc($result2)) {
-										foreach($row2 as $campo){
-											$cadena .= $campo."-";
-										}
-									}
-									
-									$fila[$clave] = $cadena;															// En la celda devolvemos un string tontorron
-									$pasas = false;																				// Cambiamos el estado de la variable a falso
-								}
-							}
-						if($pasas == true){																					// en el caso de que la variable siga siendo verdadera
-							$fila[$clave] = $valor;																		// En ese caso el valor de la variable es el valor real de la tabla
-						}
-						}
-						$resultado[] = $fila;		
-				}
-				$json = json_encode($resultado, JSON_PRETTY_PRINT);							// Lo codifico como json
-				return $json;																										// Devuelvo el json
-			}
-			
-			public function listadoTablas(){
-				$query = "
-					SELECT 
-							table_name AS 'Tables_in_".$this->basededatos."', 
-							table_comment AS 'Comentario'
-					FROM 
-							information_schema.tables
-					WHERE 
-							table_schema = '".$this->basededatos."';
-				";																				// Creo la petición dinámica
-				//echo $query;
-				$result = mysqli_query($this->conexion , $query);								// Ejecuto la peticion
-				$resultado = [];																								// Creo un array vacio
-				while ($row = mysqli_fetch_assoc($result)) {										// PAra cada uno de los registros
-						//$resultado[] = $row;																			// Los añado al array
-						$fila = [];
-						foreach($row as $clave=>$valor){
-							$fila[$clave] = $valor;
-						}
-						$resultado[] = $fila;
-				}
-				$json = json_encode($resultado, JSON_PRETTY_PRINT);							// Lo codifico como json
-				return $json;																										// Devuelvo el json
-			}
-			
-			public function columnasTabla($tabla){
-				$query = "SHOW COLUMNS FROM ".$tabla.";";																				// Creo la petición dinámica
-				$result = mysqli_query($this->conexion , $query);								// Ejecuto la peticion
-				$resultado = [];																								// Creo un array vacio
-				while ($row = mysqli_fetch_assoc($result)) {										// PAra cada uno de los registros
-						//$resultado[] = $row;																			// Los añado al array
-						$fila = [];
-						foreach($row as $clave=>$valor){
-							$fila[$clave] = $valor;
-						}
-						$resultado[] = $fila;
-				}
-				$json = json_encode($resultado, JSON_PRETTY_PRINT);							// Lo codifico como json
-				return $json;																										// Devuelvo el json
-			}
-			
+// Definición de la clase conexionDB para manejar operaciones con la base de datos.
+class conexionDB {
+    // Declaración de propiedades privadas para los datos de conexión y la conexión misma.
+    private $servidor;
+    private $usuario;
+    private $contrasena;
+    private $basededatos;
+    private $conexion;
 
-		  public function insertaTabla($tabla, $valores) {
-			 $campos = "";
-			 $parametros = "";
-			 $tipos = "";
-			 $datos = [];
+    // Constructor de la clase, que inicializa la conexión con la base de datos.
+    public function __construct() {
+        // Configuración de los datos de conexión.
+        $this->servidor = "localhost";
+        $this->usuario = "crimson";
+        $this->contrasena = "crimson";
+        $this->basededatos = "crimson";
 
-			 foreach ($valores as $clave => $valor) {
-				  if (is_array($valor)) {
-				      echo "Error: El valor de '$clave' es un array y no se puede convertir a string.";
-				      return;
-				  }
-				  
-				  $campos .= $clave . ",";
-				  $parametros .= "?,";
+        // Establecimiento de la conexión con la base de datos.
+        $this->conexion = mysqli_connect(
+            $this->servidor,
+            $this->usuario,
+            $this->contrasena,
+            $this->basededatos
+        );
+    }
 
-				  if (isset($_FILES[$clave])) {
-				      $tipos .= "b";
-				      $datos[] = file_get_contents($_FILES[$clave]['tmp_name']);
-				  } else {
-				      $tipos .= "s";
-				      $datos[] = $valor;
-				  }
-			 }
+    // Método para buscar registros exactos en una tabla.
+    public function buscar($tabla, $datos) {
+        $peticion = "SELECT * FROM " . $tabla . " WHERE "; // Inicia la consulta.
+        foreach ($datos as $clave => $valor) {
+            $peticion .= $clave . "='" . $valor . "' AND "; // Añade condiciones.
+        }
+        $peticion .= " 1;"; // Añade una condición adicional para cerrar la consulta.
 
-			 // Validación para asegurarse de que hay tipos y datos antes de continuar
-			 if (empty($tipos) || empty($datos)) {
-				  echo "Error: No se recibieron datos válidos para insertar.";
-				  return;
-			 }
+        $resultado = mysqli_query($this->conexion, $peticion); // Ejecuta la consulta.
+        $retorno = [];
+        while ($fila = mysqli_fetch_assoc($resultado)) {
+            $retorno[] = $fila; // Almacena los registros obtenidos.
+        }
+        $json = json_encode($retorno, JSON_PRETTY_PRINT); // Codifica los datos en JSON.
+        return $json; // Devuelve el JSON.
+    }
 
-			 $campos = rtrim($campos, ",");
-			 $parametros = rtrim($parametros, ",");
+    // Método para buscar registros similares (usando LIKE).
+    public function buscarSimilar($tabla, $datos) {
+        $peticion = "SELECT * FROM " . $tabla . " WHERE "; // Inicia la consulta.
+        foreach ($datos as $clave => $valor) {
+            $peticion .= $clave . " LIKE '%" . $valor . "%' AND "; // Añade condiciones de similitud.
+        }
+        $peticion .= " 1;"; // Añade una condición adicional.
 
-			 $query = "INSERT INTO $tabla ($campos) VALUES ($parametros)";
-			 $stmt = $this->conexion->prepare($query);
+        $resultado = mysqli_query($this->conexion, $peticion); // Ejecuta la consulta.
+        $retorno = [];
+        while ($fila = mysqli_fetch_assoc($resultado)) {
+            $retorno[] = $fila; // Almacena los registros obtenidos.
+        }
+        $json = json_encode($retorno, JSON_PRETTY_PRINT); // Codifica los datos en JSON.
+        return $json; // Devuelve el JSON.
+    }
 
-			 if ($stmt === false) {
-				  die("Error en la preparación de la consulta: " . $this->conexion->error);
-			 }
+    // Método para obtener los datos de una tabla, considerando las claves foráneas.
+    public function seleccionaTabla($tabla) {
+        // Consulta para obtener las restricciones de claves foráneas.
+        $query = "
+            SELECT *
+            FROM information_schema.key_column_usage
+            WHERE table_name = '" . $tabla . "'
+            AND REFERENCED_TABLE_NAME IS NOT NULL;
+        ";
+        $result = mysqli_query($this->conexion, $query);
+        $restricciones = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $restricciones[] = $row; // Almacena las restricciones.
+        }
 
-			 $stmt->bind_param($tipos, ...$datos);
+        // Consulta para obtener los datos de la tabla.
+        $query = "SELECT * FROM " . $tabla . ";";
+        $result = mysqli_query($this->conexion, $query);
+        $resultado = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $fila = [];
+            foreach ($row as $clave => $valor) {
+                $pasas = true; // Variable para verificar restricciones.
+                foreach ($restricciones as $restriccion) {
+                    if ($clave == $restriccion["COLUMN_NAME"]) {
+                        // Si la columna tiene una restricción, realizar otra consulta.
+                        $query2 = "
+                            SELECT *
+                            FROM " . $restriccion["REFERENCED_TABLE_NAME"] . "
+                            WHERE Identificador = " . $valor . ";
+                        ";
+                        $result2 = mysqli_query($this->conexion, $query2);
+                        $cadena = "";
+                        while ($row2 = mysqli_fetch_assoc($result2)) {
+                            foreach ($row2 as $campo) {
+                                $cadena .= $campo . "-"; // Construir un string con los valores.
+                            }
+                        }
+                        $fila[$clave] = $cadena; // Guardar el resultado formateado.
+                        $pasas = false;
+                    }
+                }
+                if ($pasas) {
+                    $fila[$clave] = $valor; // Si no hay restricciones, usar el valor directo.
+                }
+            }
+            $resultado[] = $fila; // Almacenar la fila en el resultado final.
+        }
+        $json = json_encode($resultado, JSON_PRETTY_PRINT); // Codificar como JSON.
+        return $json; // Devolver el JSON.
+    }
 
-			 foreach ($datos as $index => $dato) {
-				  if ($tipos[$index] === "b") {
-				      $stmt->send_long_data($index, $dato);
-				  }
-			 }
+    // Método para listar las tablas de la base de datos.
+    public function listadoTablas() {
+        $query = "
+            SELECT table_name AS 'Tables_in_" . $this->basededatos . "',
+                   table_comment AS 'Comentario'
+            FROM information_schema.tables
+            WHERE table_schema = '" . $this->basededatos . "';
+        ";
+        $result = mysqli_query($this->conexion, $query);
+        $resultado = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $fila = [];
+            foreach ($row as $clave => $valor) {
+                $fila[$clave] = $valor;
+            }
+            $resultado[] = $fila;
+        }
+        $json = json_encode($resultado, JSON_PRETTY_PRINT);
+        return $json;
+    }
 
-			 if ($stmt->execute()) {
-				  echo "Inserción exitosa en la tabla $tabla.";
-			 } else {
-				  echo "Error al insertar en la tabla $tabla: " . $stmt->error;
-			 }
+    // Método para obtener las columnas de una tabla.
+    public function columnasTabla($tabla) {
+        $query = "SHOW COLUMNS FROM " . $tabla . ";";
+        $result = mysqli_query($this->conexion, $query);
+        $resultado = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $fila = [];
+            foreach ($row as $clave => $valor) {
+                $fila[$clave] = $valor;
+            }
+            $resultado[] = $fila;
+        }
+        $json = json_encode($resultado, JSON_PRETTY_PRINT);
+        return $json;
+    }
 
-			 $stmt->close();
-		}
-			
-			public function actualizaTabla($tabla,$valores,$id){
-					$query = "
-						UPDATE ".$tabla." 
-						SET
-						";																													// Empiezo a formatear la query de actualización
-					foreach($valores as $clave=>$valor){													// Para cada uno de los datos
-						$query .= $clave."='".$valor."', ";													// Encadeno con la query
-					}
-					$query = substr($query, 0, -2);																// Le quito los dos ultimos caracteres
-						$query .= "
-						WHERE Identificador = ".$id."
-						";																													// preparo la petición de inserción
-					echo $query;
-					$result = mysqli_query($this->conexion , $query);							// Ejecuto la peticion
-					return "";							
-			}
-			public function actualizar($datos){														// Método de actualizar un solo campo en la tabla
-					
-					$query = "
-						UPDATE ".$datos['tabla']." 
-						SET ".$datos['columna']." = '".$datos['valor']."'
-						
-						WHERE Identificador = ".$datos['Identificador']."
-						";																													// preparo la petición de inserción
-					//echo $query;
-					$result = mysqli_query($this->conexion , $query);							// Ejecuto la peticion
-					return '{"mensaje":"ok"}';							
-			}
-			public function eliminaTabla($tabla,$id){
-				$query = "
-						DELETE FROM ".$tabla." 
-						WHERE Identificador = ".$id.";
-						";	
-				$result = mysqli_query($this->conexion , $query);							// Ejecuto la peticion
-			}
-			
-			private function codifica($entrada){
-				return base64_encode($entrada);
-			}
-			
-			private function decodifica($entrada){
-				return base64_decode($entrada);
-			}
-	}
+    // Método para insertar registros en una tabla.
+    public function insertaTabla($tabla, $valores) {
+        $campos = "";
+        $parametros = "";
+        $tipos = "";
+        $datos = [];
+
+        foreach ($valores as $clave => $valor) {
+            $campos .= $clave . ",";
+            $parametros .= "?,";
+            $tipos .= is_numeric($valor) ? "i" : "s";
+            $datos[] = $valor;
+        }
+        $campos = rtrim($campos, ",");
+        $parametros = rtrim($parametros, ",");
+
+        $query = "INSERT INTO $tabla ($campos) VALUES ($parametros)";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bind_param($tipos, ...$datos);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    // Método para actualizar registros en una tabla.
+    public function actualizaTabla($tabla, $valores, $id) {
+        $query = "UPDATE " . $tabla . " SET ";
+        foreach ($valores as $clave => $valor) {
+            $query .= $clave . "='" . $valor . "', ";
+        }
+        $query = rtrim($query, ", ");
+        $query .= " WHERE Identificador = " . $id;
+        mysqli_query($this->conexion, $query);
+    }
+
+    // Método para eliminar registros de una tabla.
+    public function eliminaTabla($tabla, $id) {
+        $query = "DELETE FROM " . $tabla . " WHERE Identificador = " . $id;
+        mysqli_query($this->conexion, $query);
+    }
+
+    // Métodos privados para codificar y decodificar datos en base64.
+    private function codifica($entrada) {
+        return base64_encode($entrada);
+    }
+
+    private function decodifica($entrada) {
+        return base64_decode($entrada);
+    }
+}
 
 ?>
+
+
+<!-- La clase conexionDB gestiona:
+
+Conexión con la base de datos.
+Operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
+Consultas personalizadas, incluyendo claves foráneas y relaciones entre tablas.
+Conversión de datos en JSON para facilitar su uso en aplicaciones web. -->

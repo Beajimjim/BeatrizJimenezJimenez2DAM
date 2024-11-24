@@ -2,32 +2,50 @@
 <html>
   <body>
     <script>
-      
-      const navegador = navigator;        // Instancio el objeto navigator
-      console.log(navegador);             // Lo saco por consola
-      const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
-      console.log("Tu ordenador tiene",nucleos,"núcleos")
-      let trabajadores = [];                          // Creo un array
-      let numerotrabajadores = 4;                    // Especifico cuantos workers quiero
-      let semaforo = 0
-      for(let w = 0;w<numerotrabajadores;w++){        // Creo un for para crear tantos trabajadores como necesite
-        trabajadores[w] = new Worker("009-worker.js");   // Creo una instancia de Worker
-        trabajadores[w].postMessage(w);                 // Le envío un mensaje 
-        trabajadores[w].onmessage = function(e){            // Cuando el worker me devuelve un mensaje
-          //console.log("El worker me ha devuelto un mensaje")  // Digo algo por consola
-          //console.log("Y el worker dice:",e.data)             // Soy capaz de comunicarme con el worker
-          semaforo++;
-          if(semaforo == numerotrabajadores){
-            console.log("todos los nucleos han vuelto")
-          }else{
-            console.log("un nucleo ha acabado, pero no todos han acabado")
+      // Instancia el objeto `navigator`, que contiene información del navegador y el dispositivo
+      const navegador = navigator;        
+      console.log(navegador);             // Muestra el objeto `navigator` en la consola
+
+      // Obtiene el número de núcleos del procesador utilizando la propiedad `hardwareConcurrency`
+      const nucleos = navegador.hardwareConcurrency;
+      console.log("Tu ordenador tiene", nucleos, "núcleos"); // Muestra el número de núcleos detectados
+
+      // Define un array para almacenar las instancias de los trabajadores (Web Workers)
+      let trabajadores = [];                          
+
+      // Especifica el número de trabajadores que se quieren crear
+      let numerotrabajadores = 4;                    
+
+      // Inicializa una variable semáforo para rastrear el progreso de los trabajadores
+      let semaforo = 0;
+
+      // Itera para crear tantas instancias de trabajadores como se haya especificado
+      for(let w = 0; w < numerotrabajadores; w++) {        
+        // Crea una nueva instancia de un Web Worker usando el archivo `009-worker.js`
+        trabajadores[w] = new Worker("009-worker.js");   
+
+        // Envía un mensaje inicial al trabajador, pasándole el índice `w`
+        trabajadores[w].postMessage(w);                 
+
+        // Define un manejador para cuando el trabajador devuelve un mensaje al script principal
+        trabajadores[w].onmessage = function(e) {            
+          // Incrementa el semáforo al recibir una respuesta del trabajador
+          semaforo++;    
+
+          // Comprueba si todos los trabajadores han finalizado su tarea
+          if(semaforo == numerotrabajadores) {
+            console.log("todos los nucleos han vuelto"); // Mensaje cuando todos los trabajadores terminan
+          } else {
+            console.log("un nucleo ha acabado, pero no todos han acabado"); // Mensaje cuando un trabajador termina, pero otros no
           }
-        }
+        };
       }
-      
-      
-      
-      
     </script>
   </body>
 </html>
+
+<!-- Resumen de funcionalidad:
+Detecta el número de núcleos del procesador mediante hardwareConcurrency.
+Crea un número configurable de Web Workers (en este caso, 4).
+Envía mensajes a cada trabajador para iniciar su trabajo.
+Escucha las respuestas de los trabajadores y utiliza una variable semáforo para verificar cuándo todos han finalizado. -->

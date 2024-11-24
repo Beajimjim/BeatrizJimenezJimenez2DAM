@@ -50,28 +50,58 @@
 
 
 onmessage = function(event) {
-  console.log("Worker arrancado con boton");
-  const datos = event.data.data;
-  const effect = event.data.effect;
+    // Mensaje que indica que el Worker ha comenzado a procesar.
+    console.log("Worker arrancado con boton");
 
-  for (let i = 0; i < datos.length; i += 4) { // Recorro cada píxel
-      if (effect === 'negative') {
-          // Invertir los valores de los canales RGB
-          datos[i] = 255 - datos[i];     // Rojo
-          datos[i + 1] = 255 - datos[i + 1]; // Verde
-          datos[i + 2] = 255 - datos[i + 2]; // Azul
-      } else if (effect === 'sepia') {
-          // Extraigo los valores de los canales RGB
-          let r = datos[i];
-          let g = datos[i + 1];
-          let b = datos[i + 2];
+    // Extrae los datos de los píxeles y el efecto deseado del mensaje recibido del hilo principal.
+    const datos = event.data.data;
+    const effect = event.data.effect;
 
-          // Aplicar la transformación sepia
-          datos[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189)); // Rojo
-          datos[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168)); // Verde
-          datos[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131)); // Azul
-      }
-  }
+    // Recorre cada píxel de la imagen. Cada píxel tiene 4 valores (rojo, verde, azul, alfa).
+    for (let i = 0; i < datos.length; i += 4) { 
+        if (effect === 'negative') {
+            // Si el efecto seleccionado es 'negative', invierte los valores de los canales RGB.
+            datos[i] = 255 - datos[i];         // Invertir el componente rojo.
+            datos[i + 1] = 255 - datos[i + 1]; // Invertir el componente verde.
+            datos[i + 2] = 255 - datos[i + 2]; // Invertir el componente azul.
+        } else if (effect === 'sepia') {
+            // Si el efecto seleccionado es 'sepia', transforma los valores de los canales RGB.
+            
+            // Extrae los valores actuales de los canales rojo, verde y azul.
+            let r = datos[i];
+            let g = datos[i + 1];
+            let b = datos[i + 2];
 
-  postMessage(datos); // Devolvemos los datos modificados al hilo principal
+            // Aplica la fórmula para el efecto sepia, calculando los nuevos valores RGB.
+            datos[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189)); // Nuevo valor del rojo.
+            datos[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168)); // Nuevo valor del verde.
+            datos[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131)); // Nuevo valor del azul.
+        }
+        // El canal alfa (datos[i+3]) no se modifica para conservar la transparencia.
+    }
+
+    // Envía los datos procesados de vuelta al hilo principal.
+    postMessage(datos);
 };
+
+
+// Explicación del funcionamiento:
+// Recepción de datos y efecto:
+
+// El Worker recibe un mensaje desde el hilo principal con los datos de los píxeles y el tipo de efecto (negative o sepia).
+// Los datos se extraen del mensaje (event.data.data) junto con el efecto deseado (event.data.effect).
+// Aplicación del efecto:
+
+// Si el efecto es negative, invierte los valores RGB de cada píxel para generar el efecto negativo.
+// Si el efecto es sepia, transforma los valores RGB aplicando la fórmula del efecto sepia.
+// Transformación de los datos:
+
+// En ambos efectos, los valores calculados se aseguran de no exceder 255 (el máximo para un canal de color) usando Math.min.
+// Devolución de los datos:
+
+// Una vez procesados todos los píxeles, los datos modificados se envían de vuelta al hilo principal mediante postMessage(datos).
+// Diferencias clave con versiones anteriores:
+// Efectos dinámicos: En esta versión, el tipo de efecto (negative o sepia) es dinámico, determinado por el mensaje recibido.
+// Reutilización del código: No es necesario escribir una función separada para cada efecto; la selección del efecto se maneja con un if-else.
+// Canal alfa intacto: El canal de transparencia (alpha) de cada píxel no se modifica para preservar la opacidad original de la imagen.
+// Este diseño hace que el Worker sea flexible y eficiente, ya que puede aplicar múltiples efectos dependiendo de la configuración enviada desde el hilo principal.

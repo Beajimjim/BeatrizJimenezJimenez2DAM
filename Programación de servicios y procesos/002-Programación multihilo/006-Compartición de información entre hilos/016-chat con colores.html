@@ -2,72 +2,117 @@
 <html>
   <head>
     <style>
-      section{
-        width:400px;
-        height:800px;
-        border:1px solid grey;
-        overflow-y:scroll;
+      /* Estilo para el contenedor donde se mostrarán los mensajes */
+      section {
+        width: 400px;                  /* Ancho del contenedor */
+        height: 800px;                 /* Alto del contenedor */
+        border: 1px solid grey;        /* Borde gris alrededor del contenedor */
+        overflow-y: scroll;            /* Permite desplazamiento vertical si el contenido excede el alto */
       }
-      article{
-        box-sizing:border-box;
-        padding:20px;
-        background:lightgreen;
-        border-radius:0px 10px 10px 10px;
-        margin:10px;
-        width:80%;
-        box-shadow:0px 2px 4px rgba(0,0,0,0.3);
+
+      /* Estilo para cada mensaje (article) */
+      article {
+        box-sizing: border-box;        /* Incluye padding y borde en el ancho y alto */
+        padding: 20px;                 /* Espaciado interno dentro del artículo */
+        background: lightgreen;        /* Fondo verde claro */
+        border-radius: 0px 10px 10px 10px; /* Bordes redondeados excepto el superior izquierdo */
+        margin: 10px;                  /* Espaciado entre artículos */
+        width: 80%;                    /* Ancho relativo al contenedor padre */
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra para dar relieve */
       }
     </style>
   </head>
   <body>
     <main>
+      <!-- Campo para que el usuario introduzca su nombre -->
       <input id="usuario" placeholder="Introduce tu usuario">
+
+      <!-- Contenedor donde se mostrarán los mensajes -->
       <section></section>
-      <input id="mensaje">
+
+      <!-- Campo para escribir un mensaje -->
+      <input id="mensaje" placeholder="Escribe tu mensaje aquí">
     </main>
     <script>
       ///////////////////////////////// BUCLE DE LECTURA ///////////////////////////////////////
-      function bucle(){                                                                 // Defino una funcion de bucle
-        fetch("http://192.168.1.151:5001/dame")                                         // Realizo una peticion de recepcion
-        .then(function(response){
-          return response.json()                                                         // Convierto la respuesta a json
-        })
-        .then(function(datos){                                                          // Cuando reciba los datos
-        console.log(datos)
-          let seccion = document.querySelector("section")                               // Selecciono el contenedor de destino
-          seccion.innerHTML = ""                                                        // Vacío el contenedor
-          datos.forEach(function(dato){                                                 // PAra cada uno de los datos que haya venido
-            let suma = 0;                                                               // Creo una suma inicial
-            for (let i = 0; i < dato.usuario.length; i++) {                             // Para cada una de las letras del usuario
-                suma += dato.usuario.charCodeAt(i);                                     // Le actualizo a la suma el valor numerico ascii de cada uno de los carac
-            }
-            suma %= 255                                                                 // Mediante el resto entero de la division situo el valor en un rango controlado
-            console.log(suma)
-            let bloque = document.createElement("article")                              // Creo un nuevo articulo
-            
-            let autor = document.createElement("h3")                                    // Creo un elemento h3
-            autor.textContent = dato.usuario                                            // Al autor le pongo el dato de autor
-            let parrafo = document.createElement("p")                                   // Creo un elemento de parrafo
-            parrafo.textContent = dato.mensaje                                          // Al parrafo le pongo el texto
-            bloque.appendChild(autor)                                                   // Al articulo le pongo el autor
-            bloque.appendChild(parrafo)                                                 // Al articulo le pongo el aprrafo
-            seccion.appendChild(bloque)                                                 // A la seccion le pongo el articulos
-            bloque.style.background = "hsl("+suma+",127%,50%)"                          // Le cambio el color de cada bloque en funcion del nombre de usuario
+      function bucle() {
+        // Realiza una petición GET al servidor para obtener los mensajes
+        fetch("http://192.168.1.151:5001/dame")
+          .then(function (response) {
+            // Convierte la respuesta del servidor en formato JSON
+            return response.json();
           })
-          seccion.scrollTop = 100000000000                                              // Hago un scroll infinito para asegurar que siempre se va abajo del todo
-        })
-        clearTimeout(temporizador)                                                      // Detengo el temporizador
-        temporizador = setTimeout("bucle()",1000)                                       // Vuelvo a arrancar el bucle dentro de un segundo
+          .then(function (datos) {
+            console.log(datos); // Muestra los datos en la consola para depuración
+
+            let seccion = document.querySelector("section"); // Selecciona el contenedor de mensajes
+            seccion.innerHTML = ""; // Limpia el contenido actual para evitar duplicados
+            
+            // Itera sobre los datos recibidos
+            datos.forEach(function (dato) {
+              let suma = 0; // Inicializa la suma para calcular un color único basado en el usuario
+              
+              // Suma los valores ASCII de cada carácter del nombre de usuario
+              for (let i = 0; i < dato.usuario.length; i++) {
+                suma += dato.usuario.charCodeAt(i);
+              }
+              suma %= 255; // Ajusta el valor para que esté en un rango válido para colores HSL
+              console.log(suma); // Muestra el resultado del cálculo en la consola
+
+              // Crea un bloque (article) para mostrar el mensaje
+              let bloque = document.createElement("article");
+
+              // Crea un elemento h3 para el autor
+              let autor = document.createElement("h3");
+              autor.textContent = dato.usuario; // Asigna el nombre de usuario como contenido
+
+              // Crea un elemento p para el mensaje
+              let parrafo = document.createElement("p");
+              parrafo.textContent = dato.mensaje; // Asigna el contenido del mensaje
+
+              // Agrega el autor y el mensaje al bloque
+              bloque.appendChild(autor);
+              bloque.appendChild(parrafo);
+
+              // Agrega el bloque al contenedor
+              seccion.appendChild(bloque);
+
+              // Establece un color de fondo único basado en el usuario
+              bloque.style.background = "hsl(" + suma + ", 127%, 50%)";
+            });
+
+            // Desplaza automáticamente el contenedor hacia abajo para mostrar los mensajes más recientes
+            seccion.scrollTop = 100000000000;
+          });
+
+        // Detiene cualquier temporizador previo para evitar solapamientos
+        clearTimeout(temporizador);
+
+        // Configura un nuevo temporizador para repetir el bucle después de 1 segundo
+        temporizador = setTimeout(bucle, 1000);
       }
+
       ///////////////////////////////// ENVÍO DE MENSAJES ///////////////////////////////////////
-      let entrada = document.querySelector("#mensaje")                                     // Selecciono la entrada
-      let usuario = document.querySelector("#usuario")                                     // Selecciono la entrada
-      entrada.onchange = function(){                                                    // Cuando cambie la entrada
-        fetch("http://192.168.1.151:5001/toma?mensaje="+encodeURI(this.value)+"&usuario="+encodeURI(usuario.value))          // Realizo una peticion de envio
-        this.value = ""                                                                // Vacío la entrada para que el usuario pueda seguir escribiendo
-      }
+      let entrada = document.querySelector("#mensaje"); // Selecciona el campo de entrada de mensajes
+      let usuario = document.querySelector("#usuario"); // Selecciona el campo de entrada del usuario
+
+      // Cuando el usuario escribe un mensaje y presiona Enter
+      entrada.onchange = function () {
+        // Envía el mensaje al servidor usando una petición GET con parámetros en la URL
+        fetch(
+          "http://192.168.1.151:5001/toma?mensaje=" +
+            encodeURI(this.value) +
+            "&usuario=" +
+            encodeURI(usuario.value)
+        );
+
+        // Limpia el campo de entrada para permitir escribir un nuevo mensaje
+        this.value = "";
+      };
+
       ///////////////////////////////// PONGO EL BUCLE EN MARCHA ///////////////////////////////////////
-      var temporizador = setTimeout("bucle()",1000)                                     // Lanzo una primera ejecución del bucle                                 
+      // Inicia el bucle configurando un temporizador que llama a la función `bucle` después de 1 segundo
+      var temporizador = setTimeout(bucle, 1000);
     </script>
   </body>
 </html>

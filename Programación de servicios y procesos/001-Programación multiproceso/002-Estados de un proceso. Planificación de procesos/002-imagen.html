@@ -1,17 +1,34 @@
 <!doctype html>
 <html>
   <body>
+    <!-- Definimos un elemento <canvas> donde se dibujarán gráficos e imágenes -->
     <canvas id="lienzo1"></canvas>
+    
     <script>
-        const lienzo = document.querySelector("#lienzo1")
-        lienzo.width = 2373
-        lienzo.height = 2048
-        const contexto = lienzo.getContext("2d")
-        var imagen = new Image()
+        // Seleccionamos el elemento <canvas> del DOM utilizando su ID
+        const lienzo = document.querySelector("#lienzo1");
+
+        // Establecemos el ancho del canvas en píxeles (2373 píxeles)
+        lienzo.width = 2373;
+
+        // Establecemos la altura del canvas en píxeles (2048 píxeles)
+        lienzo.height = 2048;
+
+        // Creamos un contexto 2D, que proporciona métodos para dibujar en el canvas
+        const contexto = lienzo.getContext("2d");
+
+        // Creamos un nuevo objeto de imagen para cargar una imagen desde un archivo
+        var imagen = new Image();
+
+        // Especificamos la fuente (ruta) de la imagen que deseamos cargar
         imagen.src = "foto.jpg";
-        imagen.onload = function(){
-          contexto.drawImage(imagen,0,0)
-        }
+
+        // Definimos una función que se ejecutará automáticamente cuando la imagen termine de cargarse
+        imagen.onload = function() {
+            // Dibujamos la imagen en el canvas en las coordenadas (0, 0)
+            // Esto posiciona la esquina superior izquierda de la imagen en la esquina superior izquierda del canvas
+            contexto.drawImage(imagen, 0, 0);
+        };
     </script>
   </body>
 </html>

@@ -2,26 +2,59 @@
 <html>
   <body>
     <script>
-      
-      const navegador = navigator;        // Instancio el objeto navigator
-      console.log(navegador);             // Lo saco por consola
-      const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
-      console.log("Tu ordenador tiene",nucleos,"núcleos")
-      let trabajadores = [];                          // Creo un array
-      let numerotrabajadores = 4;                    // Especifico cuantos workers quiero
-      
-      for(let w = 0;w<numerotrabajadores;w++){        // Creo un for para crear tantos trabajadores como necesite
-        trabajadores[w] = new Worker("008-worker.js");   // Creo una instancia de Worker
-        trabajadores[w].postMessage(w);                 // Le envío un mensaje 
-        trabajadores[w].onmessage = function(e){            // Cuando el worker me devuelve un mensaje
-          //console.log("El worker me ha devuelto un mensaje")  // Digo algo por consola
-          //console.log("Y el worker dice:",e.data)             // Soy capaz de comunicarme con el worker
-        }
+      // Instancia el objeto `navigator` que contiene información del navegador y del sistema del usuario.
+      const navegador = navigator;
+
+      // Muestra en la consola el objeto `navigator` completo para inspeccionar sus propiedades.
+      console.log(navegador);
+
+      // Obtiene el número de núcleos lógicos del procesador usando la propiedad `hardwareConcurrency`.
+      const nucleos = navegador.hardwareConcurrency;
+
+      // Muestra en la consola cuántos núcleos tiene el procesador del dispositivo.
+      console.log("Tu ordenador tiene", nucleos, "núcleos");
+
+      // Declara un array vacío para almacenar múltiples instancias de Workers.
+      let trabajadores = [];
+
+      // Especifica el número de Workers que deseas crear. En este caso, 4 Workers.
+      let numerotrabajadores = 4;
+
+      // Inicia un bucle para crear y gestionar tantos Workers como se especifican en `numerotrabajadores`.
+      for (let w = 0; w < numerotrabajadores; w++) {
+        // Crea un nuevo Worker a partir del archivo `008-worker.js` y lo almacena en el array `trabajadores`.
+        trabajadores[w] = new Worker("008-worker.js");
+
+        // Envía un mensaje al Worker recién creado. El mensaje enviado es el índice del Worker (`w`).
+        trabajadores[w].postMessage(w);
+
+        // Define el evento `onmessage` para manejar la respuesta que envía cada Worker al hilo principal.
+        trabajadores[w].onmessage = function(e) {
+          // Descomenta las líneas siguientes si deseas mostrar mensajes de depuración en la consola:
+          // console.log("El worker me ha devuelto un mensaje");
+          // console.log("Y el worker dice:", e.data);
+        };
       }
-      
-      
-      
-      
+
+      // Nota: Los Workers se ejecutan en paralelo e independiente, por lo que no siguen un orden secuencial.
+      // Las respuestas de los Workers pueden llegar en cualquier orden, dependiendo del tiempo de ejecución.
     </script>
   </body>
 </html>
+
+
+<!-- Explicación del flujo:
+Información del navegador y hardware:
+
+El script utiliza navigator.hardwareConcurrency para obtener el número de núcleos lógicos disponibles en el sistema, lo que puede ser útil para decidir el número de Workers a crear.
+Creación de múltiples Workers:
+
+Se crea un array trabajadores para almacenar cada instancia de Worker.
+Un bucle for itera tantas veces como numerotrabajadores, creando y configurando cada Worker.
+Comunicación con los Workers:
+
+Se utiliza postMessage para enviar un mensaje al Worker.
+El evento onmessage maneja las respuestas de los Workers. Cada Worker puede enviar datos únicos al hilo principal.
+Ejecución en paralelo:
+
+Los Workers creados se ejecutan simultáneamente, lo que mejora el rendimiento en tareas intensivas. -->

@@ -1,26 +1,58 @@
 <!doctype html>
+<!-- Declara que el documento es HTML5. Esto asegura que los navegadores rendericen correctamente. -->
 <html>
   <body>
+    <!-- Crea un elemento <canvas> con un id "lienzo1". Sirve como lienzo para dibujar en JavaScript. -->
     <canvas id="lienzo1"></canvas>
     <script>
-  
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 2373
-        lienzo.height = 2048                                  // Le pongo 4000 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "foto.JPG";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          var datos = contexto.getImageData(0,0,2373,2048)      // Leo los datos a la memoria
-          for(let i = 0;i<datos.data.length;i+=4){              // Recorro cada pixel
-            let c = datos.data                                  // Cargo los datos de ese pixel
-            let gris = Math.round((c[i] + c[i+1] + c[i+2])/3)   // Saco el promedio
-            datos.data[i] = gris;                               // actualizo el color rojo para que sea gris
-            datos.data[i+1] = gris;                             // actualizo el color verde para que sea gris
-            datos.data[i+2] = gris;                             // actualizo el color azul para que sea gris
+        // Selecciona el elemento <canvas> en el documento usando su id y lo asigna a la constante "lienzo".
+        const lienzo = document.querySelector("#lienzo1");      
+
+        // Establece el ancho del lienzo en 2373 píxeles.
+        lienzo.width = 2373;
+
+        // Establece la altura del lienzo en 2048 píxeles.
+        lienzo.height = 2048;                                  
+
+        // Obtiene el contexto 2D del lienzo, necesario para realizar dibujos en dos dimensiones.
+        const contexto = lienzo.getContext("2d");              
+
+        // Crea un nuevo objeto de tipo Image para cargar una imagen.
+        var imagen = new Image();                              
+
+        // Asigna la ruta de la imagen que se quiere cargar en el objeto "imagen".
+        imagen.src = "foto.JPG";                               
+
+        // Define una función que se ejecutará cuando la imagen se haya cargado completamente.
+        imagen.onload = function() {                           
+
+          // Dibuja la imagen cargada en el lienzo, posicionándola en las coordenadas (0,0).
+          contexto.drawImage(imagen, 0, 0);                    
+
+          // Obtiene los datos de imagen del área especificada (todo el lienzo) y los almacena en "datos".
+          var datos = contexto.getImageData(0, 0, 2373, 2048); 
+
+          // Recorre todos los píxeles de la imagen. Cada píxel tiene 4 valores (rojo, verde, azul y alfa).
+          for (let i = 0; i < datos.data.length; i += 4) {     
+
+            // Almacena los valores del array de datos de la imagen para manipularlos.
+            let c = datos.data;                                
+
+            // Calcula el valor promedio de los colores rojo, verde y azul para convertir el píxel a escala de grises.
+            let gris = Math.round((c[i] + c[i+1] + c[i+2]) / 3); 
+
+            // Asigna el valor calculado de gris al componente rojo del píxel.
+            datos.data[i] = gris;                              
+
+            // Asigna el mismo valor de gris al componente verde del píxel.
+            datos.data[i+1] = gris;                            
+
+            // Asigna el mismo valor de gris al componente azul del píxel.
+            datos.data[i+2] = gris;                            
           }
-          contexto.putImageData(datos,0,0)                      // Pego los datos en una imagen en el canvas
+
+          // Coloca los datos modificados (en escala de grises) de vuelta en el lienzo.
+          contexto.putImageData(datos, 0, 0);                  
         }
     </script>
   </body>

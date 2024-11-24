@@ -2,21 +2,49 @@
 <html>
   <body>
     <script>
-      
-      const navegador = navigator;        // Instancio el objeto navigator
-      console.log(navegador);             // Lo saco por consola
-      const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
-      console.log("Tu ordenador tiene",nucleos,"núcleos")
-      
-      let trabajador = new Worker("006-worker.js");   // Creo una instancia de Worker
-      trabajador.postMessage("hola");                 // Le envío un mensaje 
-      trabajador.onmessage = function(e){
-        console.log("El worker me ha devuelto un mensaje")
-        console.log("Y el worker dice:",e.data)
-      }
-      
-      
-      
+      // Instancia el objeto `navigator`, que contiene información del navegador y el sistema del usuario.
+      const navegador = navigator;
+
+      // Muestra el objeto `navigator` completo en la consola para inspeccionar sus propiedades.
+      console.log(navegador);
+
+      // Obtiene el número de núcleos lógicos del procesador usando la propiedad `hardwareConcurrency`.
+      const nucleos = navegador.hardwareConcurrency;
+
+      // Muestra en la consola cuántos núcleos tiene el procesador del dispositivo.
+      console.log("Tu ordenador tiene", nucleos, "núcleos");
+
+      // Crea una instancia de `Worker` asignando el archivo `006-worker.js` como el script del Worker.
+      let trabajador = new Worker("006-worker.js");
+
+      // Envía un mensaje al Worker con el contenido "hola".
+      trabajador.postMessage("hola");
+
+      // Define un evento `onmessage` para manejar las respuestas que el Worker envíe al hilo principal.
+      trabajador.onmessage = function(e) {
+        // Muestra en la consola un mensaje indicando que el Worker ha respondido.
+        console.log("El worker me ha devuelto un mensaje");
+
+        // Muestra en la consola el contenido del mensaje enviado por el Worker.
+        console.log("Y el worker dice:", e.data);
+      };
     </script>
   </body>
 </html>
+
+
+<!-- 
+Explicación del flujo:
+navigator.hardwareConcurrency:
+
+Obtiene información sobre el hardware del dispositivo, específicamente el número de núcleos lógicos del procesador.
+Creación del Worker:
+
+new Worker("006-worker.js") crea un hilo separado que ejecutará el script 006-worker.js. Este archivo debe estar en el mismo directorio que el archivo HTML.
+Envío de mensajes al Worker:
+
+trabajador.postMessage("hola") envía un mensaje al Worker, que este debe manejar.
+Recepción de mensajes del Worker:
+
+El evento onmessage permite al hilo principal procesar los mensajes que recibe del Worker.
+La propiedad e.data contiene los datos enviados por el Worker. -->

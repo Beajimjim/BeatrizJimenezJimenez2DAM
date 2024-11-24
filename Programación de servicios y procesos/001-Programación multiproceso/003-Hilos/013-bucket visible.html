@@ -2,18 +2,22 @@
 <html>
 <head>
   <style>
-    #contienecanvas{
-      position:relative;
+    /* Estilo para posicionar los lienzos */
+    #contienecanvas {
+      position: relative; /* Contenedor que posiciona los lienzos uno sobre otro */
     }
-    canvas{
-      position:absolute;
-      top:0px;
-      left:0px;
+    canvas {
+      position: absolute; /* Posición absoluta para superponer los lienzos */
+      top: 0px; /* Alinea ambos lienzos en la parte superior */
+      left: 0px; /* Alinea ambos lienzos en el lado izquierdo */
     }
   </style>
 </head>
-  <body> 
+<body> 
+  <!-- Botón para iniciar el procesamiento -->
   <button id="comenzar">Comenzar</button>
+
+  <!-- Selector para definir el tamaño del bloque (bucket) -->
   <select id="tamanio">
     <option value="4">4</option>
     <option value="8">8</option>
@@ -23,79 +27,124 @@
     <option value="128">128</option>
     <option value="256">256</option>
   </select>
-    <div id="contienecanvas">
-      <canvas id="lienzo1"></canvas>
-      <canvas id="lienzo2"></canvas>
-    </div>
-    <script>
-        /*/////////////////////////////// DECLARACIÓN DE VARIABLES GLOBALES ////////////////////////////////////*/
-        
-        var x;                                                   // Declaro una variable global x
-        var y;                                                   // Declaro una variable global y
-        var bucket;                                              // Declaro una variable bucket que define la anchura del bloque
-        
-        /*/////////////////////////////// DECLARACIÓN DE VARIABLES GLOBALES ////////////////////////////////////*/
-        
-        /*/////////////////////////////// DECLARACIÓN DE LIENZO Y PROPIEDADES INICIALES DE IMAGEN ////////////////////////////////////*/
-        
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 1024                                     // Le pongo 1024 pixeles de anchura
-        lienzo.height = 1024                                    // Le pongo 1024 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        
-        const lienzo2 = document.querySelector("#lienzo2")       // Selecciono el lienzo
-        lienzo2.width = 1024                                     // Le pongo 1024 pixeles de anchura
-        lienzo2.height = 1024                                    // Le pongo 1024 pixeles de altura
-        const contexto2 = lienzo2.getContext("2d")                // Creo un contexto para dibujar en 2d
-        
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "imagenoriginal.jpg";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          
-          x = 0;                                                // Inicialmente la X es 0
-          y = 0;                                                // inicialmente la y es 0
-          
+
+  <!-- Contenedor que incluye dos lienzos superpuestos -->
+  <div id="contienecanvas">
+    <canvas id="lienzo1"></canvas> <!-- Lienzo para la imagen principal -->
+    <canvas id="lienzo2"></canvas> <!-- Lienzo para resaltar el bloque procesado -->
+  </div>
+
+  <script>
+    /*/////////////////////////////// DECLARACIÓN DE VARIABLES GLOBALES ////////////////////////////////////*/
+    
+    var x;        // Coordenada X del bloque actual
+    var y;        // Coordenada Y del bloque actual
+    var bucket;   // Tamaño del bloque (en píxeles) que se procesará
+    
+    /*/////////////////////////////// CONFIGURACIÓN DE LOS LIENZOS ////////////////////////////////////*/
+    
+    const lienzo = document.querySelector("#lienzo1"); // Selecciono el primer lienzo (imagen principal)
+    lienzo.width = 1024; // Establezco el ancho del lienzo
+    lienzo.height = 1024; // Establezco el alto del lienzo
+    const contexto = lienzo.getContext("2d"); // Creo un contexto 2D para dibujar en el lienzo
+
+    const lienzo2 = document.querySelector("#lienzo2"); // Selecciono el segundo lienzo (para resaltar bloques)
+    lienzo2.width = 1024; // Establezco el ancho del segundo lienzo
+    lienzo2.height = 1024; // Establezco el alto del segundo lienzo
+    const contexto2 = lienzo2.getContext("2d"); // Creo un contexto 2D para resaltar bloques
+
+    // Cargamos la imagen a procesar
+    var imagen = new Image(); // Creamos un objeto de imagen
+    imagen.src = "foto1.jpg"; // Ruta de la imagen que se cargará
+    imagen.onload = function() { 
+      contexto.drawImage(imagen, 0, 0); // Dibujamos la imagen en el primer lienzo
+      x = 0; // Inicializamos la coordenada X
+      y = 0; // Inicializamos la coordenada Y
+    };
+
+    // Inicia el procesamiento al hacer clic en el botón "Comenzar"
+    document.getElementById("comenzar").onclick = function() {
+      bucket = parseInt(document.getElementById("tamanio").value); // Obtengo el tamaño del bloque del selector
+      trabajaMucho(); // Inicio el procesamiento
+    };
+
+    /*/////////////////////////////// FUNCIÓN PRINCIPAL PARA PROCESAR LA IMAGEN EN BLOQUES ////////////////////////////////////*/
+
+    function trabajaMucho() {
+      // Limpio el segundo lienzo para eliminar marcas anteriores
+      contexto2.clearRect(0, 0, 1024, 1024);
+
+      // Dibujo un rectángulo rojo para resaltar el bloque que se está procesando
+      contexto2.strokeStyle = "red"; // Color del borde
+      contexto2.lineWidth = 6; // Grosor del borde
+      contexto2.beginPath();
+      contexto2.strokeRect(x, y, bucket, bucket); // Dibujo el rectángulo en la posición (x, y)
+      contexto2.stroke();
+
+      // Obtengo los datos de píxeles del bloque actual
+      datos1 = contexto.getImageData(x, y, bucket, bucket);
+
+      // Creo un Web Worker para procesar los datos del bloque
+      var trabajador = new Worker("013-worker.js");
+      trabajador.postMessage(datos1.data); // Envío los datos al Worker para su procesamiento
+      
+      // Evento que se activa cuando el Worker devuelve los datos procesados
+      trabajador.onmessage = function(misdatos) {
+        // Actualizo los datos del bloque con los valores procesados devueltos por el Worker
+        for (let i = 0; i < datos1.data.length; i++) {
+          datos1.data[i] = misdatos.data[i];
         }
-        document.getElementById("comenzar").onclick = function(){
-          bucket = parseInt(document.getElementById("tamanio").value)                                         // Establezco la anchura inicial del bucket
-          trabajaMucho()                                        // Llamo a una primera ejecución de la funcion
-        }
-        /*/////////////////////////////// DECLARACIÓN DE LIENZO Y PROPIEDADES INICIALES DE IMAGEN ////////////////////////////////////*/
-        
-        function trabajaMucho(){
-          
-          contexto2.clearRect(0,0,1024,1024)
-          contexto2.strokeStyle = "red"
-          contexto2.lineWidth = 6
-          contexto2.beginPath()
-          contexto2.strokeRect(x,y,bucket,bucket)
-          contexto2.stroke()
-        
-          datos1 = contexto.getImageData(x,y,bucket,bucket)     // Leo la primera cuarta parte en vertical de la imagen de la imagen 
-          var trabajador = new Worker("013-worker.js");         // Creo una nueva instancia de un worker y lo pongo en el identificador llamado trabajador
-          trabajador.postMessage(datos1.data)                   // tomo los datos y se los envío al worker
-          
-          ///////////////////////////////////////////////////// Y ahora me olvido porque yo ya le he enviado los datos al trabajador, y ya si eso el trabajador me dirá algo
-          
-          trabajador.onmessage = function(misdatos){            // Cuando el trabajador finaliza me devuelve un mensaje
-            for(let i = 0;i<datos1.data.length;i++){            // tomo el array de datos que me da el worker
-              datos1.data[i] = misdatos.data[i]                 // Lo vuelco al array de datos de la imagen porque yo lo que quiero al final es una imagen
-            }
-            contexto.putImageData(datos1,x-bucket,y)            // Esa imagen que he construido con los datos que me da el worker, pues la pongo en el canvas         
-           }
-           x+=bucket;                                           // Una vez que he calculado, paso al cuadro siguiente aumentando la x
-           if(x > 1024){                                        // en el caso de que la x llegue al final
-            x = 0;                                              // Devuelvo la x a cero, lo que quiere decir que vuelvo a empezar por la izquierda
-            y += bucket                                         // Pero bajo a la fila de bajo
-           }
-           if(x < 1100 && y < 1100){                            // Si ya he llegado al final en x y en Y
-             setTimeout(function(){                             // Espera un momento porque si no la ejecucion se cuelga
-                 trabajaMucho()                                 // Haz una llamada recursiva a esta misma funcion
-             },100)                                             // Dentro de X milisegundos
-           }
-          
-        }
-    </script>
-  </body>
+        // Dibujo el bloque procesado en el primer lienzo
+        contexto.putImageData(datos1, x - bucket, y);
+      };
+
+      // Actualizo las coordenadas para el siguiente bloque
+      x += bucket; // Avanzo horizontalmente
+      if (x > 1024) { // Si llego al final de una fila
+        x = 0; // Reinicio X
+        y += bucket; // Avanzo verticalmente a la siguiente fila
+      }
+
+      // Verifico si quedan bloques por procesar
+      if (x < 1100 && y < 1100) { 
+        setTimeout(function() { // Agrego un retraso para evitar sobrecargar el navegador
+          trabajaMucho(); // Llamada recursiva para procesar el siguiente bloque
+        }, 100); // Retraso de 100 milisegundos
+      }
+    }
+  </script>
+</body>
 </html>
+
+<!-- Explicaciones Detalladas:
+Contenedor de los lienzos (#contienecanvas):
+
+Superpone dos lienzos para permitir dibujar la imagen principal en el primero (#lienzo1) y resaltar los bloques procesados en el segundo (#lienzo2).
+Funcionamiento de los Lienzos:
+
+lienzo1: Muestra la imagen original y procesa los píxeles.
+lienzo2: Dibuja un borde rojo que resalta el bloque actualmente procesado.
+Procesamiento de Bloques:
+
+La función trabajaMucho divide la imagen en bloques de tamaño bucket x bucket y los procesa uno a uno.
+Uso de Web Workers:
+
+Cada bloque se envía a un Worker (013-worker.js) para procesar los datos de píxeles.
+Los datos procesados se devuelven al hilo principal para dibujar el bloque en el lienzo.
+Coordenadas:
+
+Se actualizan las coordenadas x y y para recorrer la imagen bloque por bloque.
+Cuando x alcanza el ancho del lienzo, se reinicia y y avanza a la siguiente fila.
+Resaltado del Bloque Actual:
+
+El segundo lienzo dibuja un rectángulo rojo alrededor del bloque actual para indicar visualmente qué parte de la imagen se está procesando.
+Retraso con setTimeout:
+
+Agrega un pequeño retraso entre bloques para evitar que el navegador se bloquee al procesar imágenes grandes.
+Notas:
+Interfaz Visual:
+El resaltado en rojo permite al usuario visualizar en tiempo real qué parte de la imagen se está procesando.
+Modularidad:
+Fácil de extender para añadir más efectos o procesar múltiples imágenes.
+Eficiencia:
+Usar Web Workers asegura que el procesamiento no bloquee la interfaz del navegador. -->

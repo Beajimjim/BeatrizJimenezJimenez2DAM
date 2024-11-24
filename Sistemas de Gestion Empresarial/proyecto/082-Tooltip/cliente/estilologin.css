@@ -1,42 +1,55 @@
+/* Definición de una fuente personalizada */
 @font-face {
-  font-family: Ubuntu;
-  src: url(Ubuntu-R.ttf);
+  font-family: Ubuntu; /* Nombre de la fuente personalizada */
+  src: url(Ubuntu-R.ttf); /* Ruta al archivo de fuente */
 }
-body{
-  font-family:Ubuntu,sans-serif;
-  background:#985277;
+
+/* Estilos generales para el cuerpo de la página */
+body {
+  font-family: Ubuntu, sans-serif; /* Define la fuente principal (Ubuntu como preferida, sans-serif como alternativa) */
+  background: #985277; /* Color de fondo de la página */
 }
-#formlogin{
-  width:300px;
-  height:380px;
-  margin:auto;
-  margin-top:100px;
-  background:white;
-  padding:30px;
-  text-align:center;
+
+/* Estilos para el contenedor principal del formulario de login */
+#formlogin {
+  width: 300px; /* Ancho del formulario */
+  height: 380px; /* Altura del formulario */
+  margin: auto; /* Centra horizontalmente el formulario */
+  margin-top: 100px; /* Espaciado desde la parte superior de la página */
+  background: white; /* Color de fondo del formulario */
+  padding: 30px; /* Espaciado interno alrededor del contenido */
+  text-align: center; /* Centra el texto dentro del formulario */
 }
-#logo{
-  width:50%;
+
+/* Estilo para el logo dentro del formulario */
+#logo {
+  width: 50%; /* El logo ocupa el 50% del ancho del contenedor padre */
 }
-input,button{
-  width:100%;
-  padding:10px 0px;
-  margin-bottom:10px;
-  margin-top:10px;
-  border:none;
-  border-bottom:2px solid crimson;
-  transition:all 1s;
-  font-family:Ubuntu,sans-serif;
+
+/* Estilos compartidos para los campos de entrada y el botón */
+input, button {
+  width: 100%; /* El ancho ocupa todo el contenedor */
+  padding: 10px 0px; /* Espaciado interno vertical */
+  margin-bottom: 10px; /* Espaciado inferior entre elementos */
+  margin-top: 10px; /* Espaciado superior entre elementos */
+  border: none; /* Sin borde exterior */
+  border-bottom: 2px solid #985277; /* Línea inferior con color crimson */
+  transition: all 1s; /* Transición suave de todos los cambios en 1 segundo */
+  font-family: Ubuntu, sans-serif; /* Fuente para los campos y botones */
 }
-input:focus{
-	outline:none;
-	background:#985277;
-	color:white;
+
+/* Estilo para los campos de entrada cuando están enfocados */
+input:focus {
+  outline: none; /* Elimina el contorno predeterminado al enfocar */
+  background: #985277; /* Cambia el fondo a un color púrpura */
+  color: white; /* Cambia el color del texto a blanco */
 }
-button{
-	background:#985277;
-	color:white;
-	border:none;
-	padding:10px;
-	border-radius:20px;
+
+/* Estilo específico para el botón */
+button {
+  background: #985277; /* Fondo púrpura */
+  color: white; /* Texto blanco */
+  border: none; /* Sin bordes */
+  padding: 10px; /* Espaciado interno uniforme */
+  border-radius: 20px; /* Bordes redondeados */
 }

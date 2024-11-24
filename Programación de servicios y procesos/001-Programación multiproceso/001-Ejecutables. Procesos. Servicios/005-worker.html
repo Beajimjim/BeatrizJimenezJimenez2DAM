@@ -2,24 +2,53 @@
 <html>
   <body>
     <script>
-      
-      const navegador = navigator;        // Instancio el objeto navigator
-      console.log(navegador);             // Lo saco por consola
-      const nucleos = navegador.hardwareConcurrency // Saco el número de núcleos
-      console.log("Tu ordenador tiene",nucleos,"núcleos")
-      
-      let trabajador = new Worker("005-worker.js");   // Creo una instancia de Worker
-      trabajador.postMessage("hola");                 // Le envío un mensaje 
-      trabajador.onmessage = function(e){
-        console.log("El worker me ha devuelto un mensaje")
-        console.log("Y el worker dice:",e.data) //detecto que dice ese mensaje, es decir enviamos informacion
-      }
-      
-      
-      
+      // Instancia el objeto `navigator`, que proporciona información sobre el navegador y el sistema.
+      const navegador = navigator;
+
+      // Muestra el objeto `navigator` en la consola para inspeccionar sus propiedades.
+      console.log(navegador);
+
+      // Obtiene el número de núcleos lógicos del procesador del dispositivo mediante `hardwareConcurrency`.
+      const nucleos = navegador.hardwareConcurrency;
+
+      // Muestra en la consola cuántos núcleos tiene el procesador.
+      console.log("Tu ordenador tiene", nucleos, "núcleos");
+
+      // Crea una nueva instancia de `Worker` con el archivo `005-worker.js`, que contiene el código para ejecutarse en el hilo secundario.
+      let trabajador = new Worker("005-worker.js");
+
+      // Envía un mensaje al Worker con el contenido "hola".
+      trabajador.postMessage("hola");
+
+      // Define el evento `onmessage` para manejar la respuesta del Worker.
+      trabajador.onmessage = function(e) {
+        // Muestra un mensaje en la consola indicando que el Worker ha respondido.
+        console.log("El worker me ha devuelto un mensaje");
+
+        // Muestra el contenido del mensaje enviado desde el Worker.
+        console.log("Y el worker dice:", e.data);
+      };
     </script>
   </body>
 </html>
 
 
+
 <!-- no hacemos esto para no sobre cargar la cpu, sino para sacarle el maximo provecho a la capacidad que tengo -->
+
+<!-- 
+Explicación de las partes clave:
+navigator.hardwareConcurrency:
+
+Proporciona el número de núcleos lógicos disponibles en el procesador, útil para determinar la capacidad del hardware.
+Creación del Worker:
+
+new Worker("005-worker.js") crea un nuevo hilo secundario que ejecutará el código contenido en 005-worker.js.
+Comunicación con el Worker:
+
+postMessage("hola"): Envía un mensaje desde el hilo principal al Worker. Aquí se envía el texto "hola".
+onmessage: Maneja los mensajes enviados por el Worker de vuelta al hilo principal.
+Respuesta del Worker:
+
+Dentro de la función onmessage, la propiedad e.data contiene los datos enviados desde el Worker.
+Los datos enviados pueden ser cualquier tipo de datos serializables (números, cadenas, objetos, etc.). -->

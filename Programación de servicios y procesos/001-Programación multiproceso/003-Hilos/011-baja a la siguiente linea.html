@@ -1,59 +1,111 @@
 <!doctype html>
 <html>
   <body>
+    <!-- Canvas donde se procesará la imagen -->
     <canvas id="lienzo1"></canvas>
     <script>
         /*/////////////////////////////// DECLARACIÓN DE VARIABLES GLOBALES ////////////////////////////////////*/
         
-        var x;                                                   // Declaro una variable global x
-        var y;                                                   // Declaro una variable global y
-        var bucket;                                              // Declaro una variable bucket que define la anchura del bloque
-        
-        /*/////////////////////////////// DECLARACIÓN DE VARIABLES GLOBALES ////////////////////////////////////*/
+        var x; // Coordenada X del bloque actual que se está procesando
+        var y; // Coordenada Y del bloque actual que se está procesando
+        var bucket; // Tamaño del bloque (en píxeles) que se procesará
         
         /*/////////////////////////////// DECLARACIÓN DE LIENZO Y PROPIEDADES INICIALES DE IMAGEN ////////////////////////////////////*/
         
-        const lienzo = document.querySelector("#lienzo1")       // Selecciono el lienzo
-        lienzo.width = 2373
-        lienzo.height = 2048                                      // Le pongo 1024 pixeles de altura
-        const contexto = lienzo.getContext("2d")                // Creo un contexto para dibujar en 2d
-        var imagen = new Image()                                // Creo una nueva imagen
-        imagen.src = "foto1.jpg";                                // Le pongo una imagen real
-        imagen.onload = function(){                             // Solo cuando esa imagen haya cargado en memoria
-          contexto.drawImage(imagen,0,0)                        // Pinto la imagen
-          bucket = 200                                          // Establezco la anchura inicial del bucket
-          x = 0;                                                // Inicialmente la X es 0
-          y = 0;                                                // inicialmente la y es 0
-          trabajaMucho()                                        // Llamo a una primera ejecución de la funcion
-        }
+        const lienzo = document.querySelector("#lienzo1"); // Selecciono el elemento <canvas> por su ID
+        lienzo.width = 2373; // Ancho del lienzo en píxeles
+        lienzo.height = 2048; // Alto del lienzo en píxeles
+        const contexto = lienzo.getContext("2d"); // Creo un contexto 2D para dibujar en el canvas
         
-        /*/////////////////////////////// DECLARACIÓN DE LIENZO Y PROPIEDADES INICIALES DE IMAGEN ////////////////////////////////////*/
+        var imagen = new Image(); // Creo un objeto de imagen
+        imagen.src = "foto1.jpg"; // Especifico la ruta de la imagen que se procesará
         
-        function trabajaMucho(){
-          datos1 = contexto.getImageData(x,y,bucket,bucket)     // Leo la primera cuarta parte en vertical de la imagen de la imagen 
-          var trabajador = new Worker("011-worker.js");         // Creo una nueva instancia de un worker y lo pongo en el identificador llamado trabajador
-          trabajador.postMessage(datos1.data)                   // tomo los datos y se los envío al worker
+        // Evento que se ejecuta cuando la imagen se ha cargado completamente
+        imagen.onload = function() {
+          // Dibujo la imagen completa en el canvas, posicionada en la esquina superior izquierda (0, 0)
+          contexto.drawImage(imagen, 0, 0);
+
+          // Configuración inicial de las variables
+          bucket = 200; // Tamaño del bloque (200x200 píxeles)
+          x = 0; // Coordenada X inicial
+          y = 0; // Coordenada Y inicial
+
+          // Llamo a la función para iniciar el procesamiento de la imagen
+          trabajaMucho();
+        };
+        
+        /*/////////////////////////////// FUNCIÓN PARA PROCESAR LA IMAGEN EN BLOQUES ////////////////////////////////////*/
+        
+        function trabajaMucho() {
+          // Obtengo los datos de píxeles del bloque actual (coordenadas x, y y tamaño bucket x bucket)
+          datos1 = contexto.getImageData(x, y, bucket, bucket);
+
+          // Creo un nuevo Web Worker para procesar el bloque de forma independiente
+          var trabajador = new Worker("011-worker.js"); // El archivo del Worker contiene la lógica de procesamiento
+          trabajador.postMessage(datos1.data); // Envío los datos del bloque al Worker para su procesamiento
           
-          ///////////////////////////////////////////////////// Y ahora me olvido porque yo ya le he enviado los datos al trabajador, y ya si eso el trabajador me dirá algo
-          
-          trabajador.onmessage = function(misdatos){            // Cuando el trabajador finaliza me devuelve un mensaje
-            for(let i = 0;i<datos1.data.length;i++){            // tomo el array de datos que me da el worker
-              datos1.data[i] = misdatos.data[i]                 // Lo vuelco al array de datos de la imagen porque yo lo que quiero al final es una imagen
+          // Cuando el Worker termina su tarea, recibo un mensaje con los datos procesados
+          trabajador.onmessage = function(misdatos) {
+            // Recorro el array de datos devueltos por el Worker
+            for (let i = 0; i < datos1.data.length; i++) {
+              datos1.data[i] = misdatos.data[i]; // Actualizo los datos del bloque con los valores procesados
             }
-            contexto.putImageData(datos1,x-bucket,y)            // Esa imagen que he construido con los datos que me da el worker, pues la pongo en el canvas         
-           }
-           x+=bucket;                                           // Una vez que he calculado, paso al cuadro siguiente aumentando la x
-           if(x > 2048){                                        // en el caso de que la x llegue al final
-            x = 0;                                              // Devuelvo la x a cero, lo que quiere decir que vuelvo a empezar por la izquierda
-            y += bucket                                         // Pero bajo a la fila de bajo
-           }
-           if(x < 2373 && y < 2048){                            // Si ya he llegado al final en x y en Y
-             setTimeout(function(){                             // Espera un momento porque si no la ejecucion se cuelga
-                 trabajaMucho()                                 // Haz una llamada recursiva a esta misma funcion
-             },50)                                             // Dentro de X milisegundos
-           }
-          
+
+            // Dibujo el bloque procesado en el canvas
+            // Uso (x-bucket, y) para posicionar el bloque en la ubicación correspondiente
+            contexto.putImageData(datos1, x - bucket, y);
+          };
+
+          // Actualizo la posición para el siguiente bloque
+          x += bucket; // Avanzo horizontalmente al siguiente bloque
+          if (x > 2048) { // Si llego al final de una fila (supero el ancho del canvas)
+            x = 0; // Reinicio X para empezar desde la izquierda
+            y += bucket; // Avanzo verticalmente a la siguiente fila
+          }
+
+          // Compruebo si aún quedan bloques por procesar
+          if (x < 2373 && y < 2048) { // Si no he terminado de recorrer el canvas
+            // Llamo a la función nuevamente después de un retraso para evitar colgar el navegador
+            setTimeout(function() {
+              trabajaMucho(); // Llamada recursiva para procesar el siguiente bloque
+            }, 50); // Espera 50 milisegundos antes de continuar
+          }
         }
     </script>
   </body>
 </html>
+
+
+<!-- Explicaciones Detalladas:
+Configuración del Canvas:
+
+Se selecciona el elemento <canvas> y se configura con un ancho de 2373 píxeles y una altura de 2048 píxeles, suficiente para cargar imágenes grandes.
+Carga de la Imagen:
+
+El objeto Image permite cargar y dibujar una imagen en el canvas.
+El evento onload asegura que el código no intente procesar la imagen antes de que esté completamente cargada.
+Procesamiento en Bloques:
+
+La imagen se divide en bloques de tamaño bucket x bucket (200x200 píxeles en este caso).
+Cada bloque se procesa de manera independiente para evitar sobrecargar el navegador.
+Uso de Web Workers:
+
+Cada bloque de la imagen se envía a un Worker (011-worker.js) para su procesamiento. Esto permite ejecutar tareas pesadas en un hilo separado, manteniendo la interfaz del navegador responsiva.
+Una vez que el Worker termina, devuelve los datos procesados, que se actualizan en el canvas con putImageData.
+Gestión de Coordenadas:
+
+Se avanza horizontalmente bloque por bloque. Cuando se llega al final de una fila (x > 2048), la coordenada X se reinicia y la coordenada Y avanza a la siguiente fila.
+Recursión Controlada:
+
+La función trabajaMucho se llama recursivamente con un pequeño retraso (setTimeout de 50 ms), lo que evita que el navegador se bloquee durante el procesamiento de grandes imágenes.
+Notas:
+Eficiencia:
+
+Dividir la imagen en bloques pequeños y usar Web Workers mejora el rendimiento, especialmente para imágenes grandes.
+Limitaciones Actuales:
+
+El código supone que la imagen tiene un tamaño fijo y que los bloques se alinean perfectamente. Si el tamaño de la imagen no es múltiplo de bucket, podrían quedar bloques parciales sin procesar.
+Posibles Mejoras:
+
+Ajustar dinámicamente el tamaño de los bloques para manejar bordes no alineados.
+Añadir un control para finalizar el proceso y mostrar un mensaje al completar el procesamiento. -->
