@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Canvas para renderizar gráficos e imágenes -->
+    <canvas></canvas>
+    <script>
+      // Obtén el elemento canvas del DOM
+      const lienzo = document.querySelector("canvas");
+
+      // Obtén el contexto 2D del canvas para trabajar con gráficos bidimensionales
+      const contexto = lienzo.getContext("2d");
+
+      // Configura las dimensiones del canvas: 1920x1080 píxeles (resolución Full HD)
+      lienzo.width = 1920; // Ancho del canvas
+      lienzo.height = 1080; // Alto del canvas
+
+      // Crea un objeto para cargar una imagen
+      let imagen = new Image();
+
+      // Especifica la fuente de la imagen
+      imagen.src = "captura.png"; // Asegúrate de que "captura.png" esté en la misma carpeta o en una ruta accesible
+
+      // Función que se ejecuta una vez que la imagen ha sido cargada
+      imagen.onload = function () {
+        // Dibuja la imagen en el canvas, comenzando desde la posición (0,0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Extrae los datos de los píxeles (RGBA) de la imagen renderizada en el canvas
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Crea un arreglo para almacenar los valores RGB combinados de los píxeles
+        const sintransparencia = [];
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Combina los valores R, G y B en un solo número entero
+          sintransparencia.push(
+            coleccion[i] * 255 * 255 + // Multiplica R por 255^2 (peso mayor)
+            coleccion[i + 1] * 255 +  // Multiplica G por 255 (peso medio)
+            coleccion[i + 2]          // Añade B directamente (peso menor)
+          );
+        }
+
+        // Obtiene el uso inicial de memoria antes de optimizar el arreglo
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Convierte el arreglo a un Uint8Array para reducir el uso de memoria
+        const sintransparencia8 = new Uint8Array(sintransparencia);
+
+        // Calcula el impacto en memoria tras un retraso de 100 ms
+        setTimeout(() => {
+          // Obtiene el uso final de memoria después del procesamiento
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la memoria utilizada
+          let memoriaUtilizada = final - inicial;
+
+          // Imprime la memoria utilizada en bytes
+          console.log(memoriaUtilizada);
+
+          // Imprime el arreglo con los valores RGB combinados
+          console.log(sintransparencia);
+        }, 100); // Espera 100 ms para estabilizar las operaciones
+      };
+    </script>
+  </body>
+</html>
+
+
+<!-- Qué Hace Este Código
+Carga una imagen (captura.png) en un canvas de 1920x1080 píxeles.
+Extrae los datos de píxeles de la imagen renderizada (valores RGBA).
+Combina los valores RGB en un único número entero por píxel.
+Optimiza el almacenamiento utilizando un Uint8Array.
+Mide el impacto en la memoria del heap de JavaScript al realizar estas operaciones.
+Imprime en la consola:
+La memoria utilizada en bytes.
+El arreglo con los valores RGB combinados.
+ -->

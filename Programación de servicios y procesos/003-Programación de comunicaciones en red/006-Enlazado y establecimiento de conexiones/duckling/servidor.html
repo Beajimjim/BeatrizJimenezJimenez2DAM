@@ -1,0 +1,112 @@
+<!doctype>
+<html>
+<head>
+    <script src="funciones.js"></script> <!-- Incluye un archivo externo con funciones adicionales -->
+</head>
+<body>
+    <h1>Duckling Server</h1> <!-- Título principal de la página -->
+    <canvas></canvas> <!-- Lienzo donde se dibujará la captura de pantalla -->
+    <button>Pulsame</button> <!-- Botón para enviar un mensaje al servidor -->
+    <script>
+        var contexto; // Variable global para almacenar el contexto del lienzo
+
+        // Establezco una conexión WebSocket con el servidor en la dirección especificada
+        const socket = new WebSocket("http://localhost:5000");
+
+        ///////////////////////////////// ABRO CONEXIÓN DE SOCKET //////////////////////////////
+
+        // Evento que se ejecuta cuando la conexión WebSocket se abre correctamente
+        socket.addEventListener("open", (event) => {
+            console.log("WebSocket connection opened"); // Mensaje en consola indicando que la conexión está abierta
+        });
+
+        // Evento que se ejecuta si ocurre algún error en la conexión WebSocket
+        socket.addEventListener("error", (event) => {
+            console.error("WebSocket error:", event); // Imprime el error en la consola
+        });
+
+        //////////////////////////////// INTERACCIÓN CON EL BOTÓN //////////////////////////////
+
+        // Al hacer clic en el botón, se envía un mensaje JSON al servidor
+        document.querySelector("button").onclick = function() {
+            socket.send(JSON.stringify({"mensaje": "ok"})); // Envía un mensaje en formato JSON
+        };
+
+        //////////////////////////////// CAPTURA DE PANTALLA //////////////////////////////
+
+        // Función asíncrona para capturar la pantalla
+        async function captureScreen() {
+            try {
+                // Solicita al usuario permisos para capturar la pantalla
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                const video = document.createElement('video'); // Crea un elemento de video
+                video.srcObject = stream; // Asigna el flujo de la pantalla al video
+
+                let lienzo = document.createElement("canvas"); // Crea un elemento canvas
+                contexto = lienzo.getContext("2d"); // Obtiene el contexto del lienzo para dibujar
+                lienzo.width = 1920; // Define el ancho del lienzo
+                lienzo.height = 1080; // Define la altura del lienzo
+                document.body.appendChild(lienzo); // Añade el lienzo al cuerpo del documento
+
+                // Evento que se dispara cuando los metadatos del video están cargados
+                video.onloadedmetadata = function() {
+                    video.play(); // Reproduce el video
+                };
+                document.body.appendChild(video); // Añade el video al cuerpo del documento
+
+                // Evento que se dispara cada vez que el video se actualiza
+                video.addEventListener('timeupdate', () => {
+                    contexto.drawImage(video, 0, 0); // Dibuja el contenido del video en el lienzo
+                });
+            } catch (error) {
+                // Captura e informa cualquier error al intentar capturar la pantalla
+                console.error("Error al capturar la pantalla:", error);
+            }
+        }
+
+        captureScreen(); // Llama a la función para iniciar la captura de pantalla
+
+        //////////////////////////////// ENVÍO PERIÓDICO DE DATOS //////////////////////////////
+
+        // Temporizador que ejecuta la función `bucle` cada 5 segundos inicialmente
+        var temporizador = setTimeout("bucle()", 5000);
+
+        // Función que envía los datos comprimidos al servidor mediante WebSocket
+        function bucle() {
+            let datos = contexto.getImageData(0, 0, 1920, 1080).data; // Obtiene los datos del lienzo
+            socket.send(JSON.stringify(comprimir(datos))); // Comprime los datos y los envía al servidor
+            console.log("datos enviados"); // Informa en la consola que los datos se enviaron
+
+            clearTimeout(temporizador); // Limpia el temporizador actual
+            temporizador = setTimeout("bucle()", 1000); // Reinicia el temporizador para ejecutarse cada segundo
+        }
+    </script>
+</body>
+</html>
+
+
+<!-- Explicación Detallada:
+Conexión WebSocket:
+
+Se establece una conexión con un servidor WebSocket para enviar datos de video comprimidos.
+Eventos como open y error manejan la apertura y los errores de la conexión.
+Captura de Pantalla:
+
+Usa getDisplayMedia para solicitar permiso al usuario y capturar la pantalla.
+Dibuja el contenido capturado en un elemento <canvas>.
+Actualización del Lienzo:
+
+Cada vez que el video actualizado se reproduce, el contenido se dibuja en el lienzo.
+Compresión de Datos:
+
+Los datos del lienzo se convierten en un array RGBA y se comprimen usando la función comprimir.
+Envío de Datos al Servidor:
+
+Los datos comprimidos se envían al servidor cada segundo mediante un WebSocket.
+Temporizador:
+
+El temporizador asegura que los datos del lienzo se envíen de forma periódica al servidor.
+Casos de Uso:
+Compartir capturas de pantalla o grabaciones en tiempo real.
+Transmitir datos comprimidos a un servidor para análisis o almacenamiento.
+Crear sistemas básicos de transmisión de pantalla o conferencias. -->

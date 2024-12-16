@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+	<head>
+		<style>
+			/* Estilos generales */
+			* {
+				padding: 0px;
+				margin: 0px;
+			}
+			body, html {
+				height: 100%;
+				margin: 0px;
+				padding: 0px;
+			}
+			body {
+				background: rgb(220,220,220); /* Fondo gris claro */
+				display: flex;
+				flex-direction: row; /* Layout horizontal */
+				flex-wrap: nowrap;
+				justify-content: space-between; /* Separación máxima entre elementos */
+				align-items: stretch; /* Elementos se estiran verticalmente */
+				align-content: stretch;
+			}
+			/* Menú de navegación lateral */
+			nav {
+				width: 20%; /* Ocupa el 20% del ancho */
+				box-sizing: border-box; /* Incluye padding y borde en el ancho total */
+				padding: 20px;
+				background: white;
+			}
+			nav ul {
+				list-style-type: none; /* Quita los bullets de la lista */
+				padding: 0px;
+				margin: 0px;
+			}
+			/* Contenido principal */
+			main {
+				width: 80%; /* Ocupa el 80% del ancho */
+			}
+			/* Estilos para cada correo */
+			article {
+				background: white;
+				padding: 20px;
+				border: 1px solid grey;
+				border-radius: 2px;
+				box-shadow: 0px 1px 2px rgba(0,0,0,0.1); /* Sombras ligeras */
+				margin: 2px;
+			}
+			/* Formulario para enviar correos */
+			#enviar {
+				display: none; /* Por defecto no se muestra */
+				height: 100%;
+			}
+			#enviar article {
+				box-sizing: border-box;
+				padding: 20px;
+			}
+			#enviar article>* {
+				width: 100%;
+				margin-bottom: 5px;
+				padding: 10px 0px;
+			}
+			#enviar article textarea {
+				height: 500px; /* Altura fija para el campo de texto */
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Menú lateral -->
+		<nav>
+			<ul>
+				<li id="nuevocorreo">Nuevo correo</li> <!-- Botón para escribir un nuevo correo -->
+				<li id="recibidos">Recibidos</li> <!-- Botón para ver correos recibidos -->
+				<li>Enviados</li> <!-- Botón para ver correos enviados -->
+			</ul>
+		</nav>
+		<main>
+			<!-- Formulario para enviar correos -->
+			<div id="enviar">
+				<article>
+					<h3>Asunto:<input type="text" id="asunto"></h3> <!-- Campo para el asunto -->
+					<h4>Para:<input type="text" id="para"></h4> <!-- Campo para el destinatario -->
+					<p>Mensaje: <textarea id="mensaje"></textarea> <!-- Campo para el mensaje -->
+					<button>Enviar</button> <!-- Botón para enviar el correo -->
+				</article>
+			</div>
+			<!-- Bandeja de correos -->
+			<div id="bandeja"></div>
+		</main>
+		<!-- Plantilla para correos individuales -->
+		<template id="correo">
+			<article>
+				<h3>Asunto</h3> <!-- Lugar para el asunto -->
+				<h4>De:</h4> <!-- Lugar para el remitente -->
+				<p>Cuerpo del correo</p> <!-- Lugar para el contenido del correo -->
+			</article>
+		</template>
+		<script>
+			// Seleccionar la plantilla de correos
+			const plantilla = document.getElementById('correo');
+			// Seleccionar el contenedor de la bandeja
+			const contenedor = document.querySelector('#bandeja');
+
+			// Obtener correos desde el servidor
+			fetch("http://localhost:5000/recibir")
+			.then(function(response){
+				return response.json(); // Convertir la respuesta a JSON
+			})
+			.then(function(datos){
+				console.log(datos); // Imprimir los datos en consola
+				datos.forEach(dato => {
+					// Clonar la plantilla para cada correo
+					let tarjeta = plantilla.content.cloneNode(true);
+					let article = tarjeta.querySelector("article");
+					// Rellenar la plantilla con datos del correo
+					article.querySelector("h3").textContent = dato.Asunto;
+					article.querySelector("h4").textContent = "De: " + dato.De;
+					article.querySelector("p").textContent = dato.Cuerpo;
+					// Guardar el ID del correo como atributo de datos
+					article.dataset.mailId = dato.mail_id;
+					article.onclick = function() {
+						// Buscar detalles del correo por su fecha
+						const fecha = dato.Fecha;
+						console.log("Voy a buscar por fecha:", fecha);
+						fetch(`http://localhost:5000/recibir_por_fecha/${encodeURIComponent(fecha)}`)
+						.then(response => response.json())
+						.then(data => {
+							console.log("Email data:", data);
+						})
+						.catch(error => console.error("Error fetching email by date:", error));
+					};
+					// Agregar el correo al contenedor de la bandeja
+					contenedor.appendChild(tarjeta);
+				});
+			});
+
+			// Botón para enviar correos
+			let boton = document.querySelector("button");
+			boton.onclick = function() {
+				// Crear el mensaje a partir de los campos de entrada
+				mensaje = {
+					"asunto": document.querySelector("#asunto").value,
+					"para": document.querySelector("#para").value,
+					"mensaje": document.querySelector("#mensaje").value,
+				};
+				// Enviar el mensaje al servidor
+				fetch("http://localhost:5000/enviar", {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(mensaje),
+				})
+				.then(function(response){
+					return response.text(); // Obtener la respuesta como texto
+				})
+				.then(function(datos){
+					// Volver a la bandeja después de enviar
+					document.querySelector("#enviar").style.display = "none";
+					document.querySelector("#bandeja").style.display = "block";
+				});
+			};
+
+			// Botón para mostrar el formulario de nuevo correo
+			let nuevocorreo = document.querySelector("#nuevocorreo");
+			nuevocorreo.onclick = function() {
+				document.querySelector("#enviar").style.display = "block";
+				document.querySelector("#bandeja").style.display = "none";
+			};
+		</script>
+	</body>
+</html>
+
+
+
+<!-- Descripción:
+Estilo:
+
+El diseño usa flexbox para organizar los elementos.
+El menú lateral ocupa el 20% y el contenido principal el 80%.
+Navegación:
+
+Puedes alternar entre el formulario para enviar correos y la bandeja.
+Funciones:
+
+Recupera correos del servidor usando fetch.
+Envia correos mediante un POST al servidor.
+Permite buscar correos por fecha al hacer clic en un correo.
+Plantilla:
+
+Los correos se generan dinámicamente a partir de una plantilla template.
+Compatibilidad:
+
+Asegúrate de que el servidor en localhost:5000 esté configurado para manejar las rutas /recibir, /recibir_por_fecha, y /enviar. -->

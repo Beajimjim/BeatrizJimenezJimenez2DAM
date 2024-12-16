@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Canvas para renderizar la imagen -->
+    <canvas></canvas>
+    <script>
+      // Obtiene el elemento <canvas> del DOM
+      const lienzo = document.querySelector("canvas");
+
+      // Obtiene el contexto 2D del canvas para dibujar gráficos
+      const contexto = lienzo.getContext("2d");
+
+      // Establece el ancho y alto del canvas
+      lienzo.width = 200;  // Ancho del canvas
+      lienzo.height = 200; // Alto del canvas
+
+      // Crea un nuevo objeto de imagen
+      let imagen = new Image();
+
+      // Establece la fuente de la imagen (ruta del archivo)
+      imagen.src = "foto1.jpg";
+
+      // Define una función que se ejecutará cuando la imagen haya cargado
+      imagen.onload = function () {
+        // Dibuja la imagen en el canvas a partir de la posición (0, 0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Obtiene el uso inicial de memoria del heap de JavaScript
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Extrae los datos de píxeles de la imagen renderizada en el canvas
+        const coleccion = contexto.getImageData(0, 0, 200, 200).data;
+
+        // Espera 100 ms para medir el uso final de memoria
+        setTimeout(() => {
+          // Obtiene el uso final de memoria del heap de JavaScript
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la memoria utilizada restando el estado inicial del estado final
+          let memoriaUtilizada = final - inicial;
+
+          // Imprime en la consola la memoria utilizada
+          console.log(memoriaUtilizada);
+
+          // Imprime en la consola los datos de la imagen (arreglo de píxeles)
+          console.log(coleccion);
+        }, 100); // Retraso de 100 ms
+      };
+    </script>
+  </body>
+</html>
+
+<!-- Explicación del Código
+1. Crear el Canvas y Configurar su Contexto
+javascript
+Copiar código
+const lienzo = document.querySelector("canvas");
+const contexto = lienzo.getContext("2d");
+lienzo.width = 200;
+lienzo.height = 200;
+Canvas (<canvas>): Es un elemento HTML que permite renderizar gráficos en 2D o 3D.
+Contexto 2D (getContext("2d")): Proporciona métodos y propiedades para dibujar gráficos bidimensionales.
+Ancho y Alto: Se establece un tamaño fijo de 200x200 píxeles para el canvas.
+2. Cargar y Dibujar una Imagen
+javascript
+Copiar código
+let imagen = new Image();
+imagen.src = "foto1.jpg";
+new Image(): Crea un objeto de imagen en JavaScript.
+imagen.src: Especifica la fuente de la imagen, que debe estar disponible en la misma ubicación del servidor o en una URL válida.
+javascript
+Copiar código
+imagen.onload = function () {
+  contexto.drawImage(imagen, 0, 0);
+};
+imagen.onload: Define una función que se ejecuta cuando la imagen se carga completamente.
+drawImage: Dibuja la imagen cargada en el canvas comenzando desde la posición (0, 0).
+3. Extraer Datos de los Píxeles
+javascript
+Copiar código
+const coleccion = contexto.getImageData(0, 0, 200, 200).data;
+getImageData:
+Extrae los datos de píxeles del canvas en el área especificada (0, 0 a 200, 200).
+Devuelve un objeto con los valores RGBA (rojo, verde, azul, alfa) de cada píxel.
+.data:
+Es un arreglo que contiene los valores de los canales RGBA.
+Cada píxel tiene 4 valores consecutivos en el arreglo: R, G, B y A (por ejemplo, [255, 255, 255, 255] para blanco).
+4. Medir el Uso de Memoria
+javascript
+Copiar código
+const inicial = performance.memory.usedJSHeapSize;
+Obtiene el uso inicial de memoria del heap de JavaScript antes de realizar operaciones con los datos de píxeles.
+javascript
+Copiar código
+setTimeout(() => {
+  const final = performance.memory.usedJSHeapSize;
+  let memoriaUtilizada = final - inicial;
+  console.log(memoriaUtilizada);
+}, 100);
+Usa setTimeout para calcular el uso de memoria después de un retraso de 100 milisegundos.
+Resta el uso inicial de memoria (inicial) al uso final (final) para obtener cuánta memoria adicional fue utilizada.
+5. Imprimir Resultados
+javascript
+Copiar código
+console.log(memoriaUtilizada); // Imprime la memoria utilizada en bytes
+console.log(coleccion); // Imprime el arreglo de datos de píxeles
+memoriaUtilizada: Permite evaluar el impacto de la operación de extracción de píxeles en el uso de memoria.
+coleccion: Muestra el contenido del arreglo de píxeles para inspeccionar los valores RGBA.
+Qué Hace Este Código
+Carga una imagen en un canvas.
+Extrae los datos de píxeles (RGBA) de la imagen dibujada.
+Mide el impacto en la memoria del heap antes y después de extraer los datos.
+Imprime en la consola:
+La cantidad de memoria adicional utilizada.
+Los datos de los píxeles extraídos.
+ -->

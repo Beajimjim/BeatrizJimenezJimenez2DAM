@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Canvas para renderizar gráficos e imágenes -->
+    <canvas></canvas>
+    <script>
+      // Obtén el elemento canvas del DOM
+      const lienzo = document.querySelector("canvas");
+
+      // Obtén el contexto 2D del canvas para dibujar gráficos
+      const contexto = lienzo.getContext("2d");
+
+      // Configura el tamaño del canvas: 1920 píxeles de ancho y 1080 píxeles de alto (resolución Full HD)
+      lienzo.width = 1920; // Ancho del canvas
+      lienzo.height = 1080; // Alto del canvas
+
+      // Crea un nuevo objeto para cargar una imagen
+      let imagen = new Image();
+
+      // Especifica la ruta de la imagen a cargar
+      imagen.src = "captura.png"; // Asegúrate de que el archivo "captura.png" esté disponible en la misma carpeta o una ruta válida
+
+      // Función que se ejecuta cuando la imagen ha sido completamente cargada
+      imagen.onload = function () {
+        // Dibuja la imagen en el canvas comenzando desde la posición (0,0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Extrae los datos de píxeles de la región dibujada en el canvas
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Crea un nuevo arreglo para almacenar los valores RGB de los píxeles (sin incluir el canal Alfa)
+        const sintransparencia = [];
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Agrega el valor del canal Rojo (R)
+          sintransparencia.push(coleccion[i]);
+          // Agrega el valor del canal Verde (G)
+          sintransparencia.push(coleccion[i + 1]);
+          // Agrega el valor del canal Azul (B)
+          sintransparencia.push(coleccion[i + 2]);
+          // El canal Alfa (A) se omite aquí
+        }
+
+        // Obtiene el uso inicial de memoria antes de crear la nueva estructura
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Crea un nuevo arreglo de tipo Uint8Array para optimizar la memoria
+        const sintransparencia8 = new Uint8Array(sintransparencia);
+
+        // Calcula el uso de memoria después de un retraso de 100 ms
+        setTimeout(() => {
+          // Obtiene el uso final de memoria después de crear el Uint8Array
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la memoria utilizada restando el uso inicial del final
+          let memoriaUtilizada = final - inicial;
+
+          // Imprime en la consola la cantidad de memoria utilizada (en bytes)
+          console.log(memoriaUtilizada);
+
+          // Imprime en la consola el nuevo arreglo optimizado
+          console.log(sintransparencia8);
+        }, 100); // Retraso de 100 ms para dar tiempo a completar las operaciones de memoria
+      };
+    </script>
+  </body>
+</html>
+<!-- 
+Qué Hace Este Código
+Carga y dibuja una imagen (captura.png) en un canvas de resolución 1920x1080.
+Extrae los datos RGBA de la imagen dibujada en el canvas.
+Crea un nuevo arreglo que almacena solo los canales RGB, omitiendo el canal Alfa.
+Convierte el arreglo RGB en un Uint8Array para optimizar el uso de memoria.
+Mide el impacto en la memoria del heap de JavaScript al realizar estas operaciones.
+Imprime en la consola:
+La cantidad de memoria utilizada (en bytes).
+Los datos del nuevo arreglo optimizado.
+ -->

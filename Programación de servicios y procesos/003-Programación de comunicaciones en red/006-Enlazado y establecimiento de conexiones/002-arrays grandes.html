@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      // Obtiene el tamaño inicial de memoria del heap de JavaScript al cargar la página
+      const inicial = performance.memory.usedJSHeapSize;
+
+      // Crea un arreglo vacío llamado 'coleccion'
+      let coleccion = [];
+
+      // Llena el arreglo con 1,000,000 de ceros
+      for (let i = 0; i < 1000000; i++) {
+        coleccion.push(0); // Agrega un valor '0' al final del arreglo
+      }
+
+      // Espera 100 milisegundos para medir el uso de memoria después de llenar el arreglo
+      setTimeout(() => {
+        // Obtiene el tamaño final de memoria del heap de JavaScript
+        const final = performance.memory.usedJSHeapSize;
+
+        // Calcula cuánta memoria adicional se utilizó al llenar el arreglo
+        let memoriaUtilizada = final - inicial;
+
+        // Imprime la memoria utilizada en la consola
+        console.log(memoriaUtilizada);
+      }, 100); // Retraso de 100 ms para permitir que las operaciones en el heap se estabilicen
+    </script>
+  </body>
+</html>
+
+<!-- Explicación del Código
+1. performance.memory.usedJSHeapSize
+Es una API que mide cuánta memoria se está utilizando en el heap de JavaScript.
+usedJSHeapSize devuelve el tamaño actual en bytes.
+2. Inicialización de la Memoria
+javascript
+Copiar código
+const inicial = performance.memory.usedJSHeapSize;
+Almacena la cantidad inicial de memoria utilizada al cargar la página. Esto sirve como punto de referencia para calcular los cambios posteriores en el uso de memoria.
+3. Creación de un Arreglo Grande
+javascript
+Copiar código
+let coleccion = [];
+for (let i = 0; i < 1000000; i++) {
+  coleccion.push(0);
+}
+Crea un arreglo vacío llamado coleccion.
+Usa un bucle for para agregar 1,000,000 de ceros al arreglo.
+Cada iteración del bucle agrega un nuevo elemento al final del arreglo.
+Esto aumenta gradualmente el uso de memoria en el heap.
+4. Medir el Cambio en el Uso de Memoria
+javascript
+Copiar código
+setTimeout(() => {
+  const final = performance.memory.usedJSHeapSize;
+  let memoriaUtilizada = final - inicial;
+  console.log(memoriaUtilizada);
+}, 100);
+Usa setTimeout para esperar 100 milisegundos antes de medir la memoria utilizada.
+Esto da tiempo al navegador para completar las operaciones de memoria relacionadas con el arreglo.
+Calcula la diferencia entre la memoria final (final) y la inicial (inicial).
+memoriaUtilizada indica cuántos bytes adicionales se usaron para almacenar el arreglo.
+Imprime el resultado en la consola.
+Qué Hace Este Código
+Crea un arreglo de 1,000,000 de elementos.
+Mide cuánta memoria adicional se utilizó en el heap para almacenar estos elementos.
+Imprime la memoria utilizada (en bytes) en la consola después de un breve retraso.
+ -->

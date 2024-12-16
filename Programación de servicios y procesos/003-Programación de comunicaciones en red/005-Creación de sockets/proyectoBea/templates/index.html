@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Define el conjunto de caracteres como UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Asegura que el diseño sea responsivo -->
+    <title>Videoconferencia</title> <!-- Título de la página -->
+
+    <style>
+        /* Estilo general del cuerpo de la página */
+        body {
+            margin: 0; /* Elimina los márgenes */
+            font-family: 'Arial', sans-serif; /* Usa una fuente limpia y moderna */
+            background-color: #f4f6f9; /* Color de fondo claro */
+            color: #333; /* Color de texto */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra elementos horizontalmente */
+            justify-content: center; /* Centra elementos verticalmente */
+        }
+
+        /* Estilo del encabezado */
+        h1 {
+            margin: 20px; /* Espaciado externo */
+            font-size: 2.5rem; /* Tamaño de fuente grande */
+            color: #4a90e2; /* Color azul atractivo */
+            text-align: center; /* Centrado */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+        }
+
+        /* Contenedor de los videos */
+        #videos {
+            display: grid; /* Usa una cuadrícula para organizar los videos */
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Ajusta el número de columnas según el ancho disponible */
+            gap: 15px; /* Espaciado entre videos */
+            padding: 20px; /* Espaciado interno */
+            max-width: 1200px; /* Ancho máximo del contenedor */
+            width: 100%; /* Ocupa todo el ancho disponible */
+        }
+
+        /* Estilo de cada canvas (video) */
+        canvas {
+            border: 3px solid #4a90e2; /* Borde azul */
+            border-radius: 10px; /* Esquinas redondeadas */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+            width: 100%; /* Ocupa todo el ancho del contenedor */
+            max-width: 320px; /* Ancho máximo */
+            height: auto; /* Mantiene proporción */
+            background-color: #fff; /* Fondo blanco */
+        }
+
+        /* Estilo para las notificaciones */
+        .notification {
+            position: fixed; /* Fija la notificación en la pantalla */
+            bottom: 10px; /* Distancia desde la parte inferior */
+            right: 10px; /* Distancia desde la derecha */
+            padding: 10px 20px; /* Espaciado interno */
+            background-color: #4caf50; /* Color verde de éxito */
+            color: white; /* Texto blanco */
+            font-size: 1rem; /* Tamaño de fuente moderado */
+            border-radius: 5px; /* Bordes redondeados */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+            animation: fadeOut 5s ease-in-out forwards; /* Desaparece después de 5 segundos */
+        }
+
+        /* Animación para desvanecer notificaciones */
+        @keyframes fadeOut {
+            0% { opacity: 1; } /* Comienza completamente visible */
+            90% { opacity: 0.8; } /* Se desvanece ligeramente */
+            100% { opacity: 0; transform: translateY(20px); } /* Desaparece completamente */
+        }
+    </style>
+</head>
+<body>
+    <h1>Videoconferencia</h1> <!-- Título principal -->
+    <div id="videos"></div> <!-- Contenedor para los videos -->
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script> <!-- Biblioteca Socket.IO -->
+    <script>
+        // Conectar con el servidor usando Socket.IO
+        const socket = io('https://4f44-2a0c-5a84-7105-200-59be-efe5-3e48-b279.ngrok-free.app'); // Cambia por tu URL de Ngrok
+        const videosDiv = document.getElementById('videos'); // Contenedor de videos
+
+        // Función para crear un cuadro de video para un usuario
+        const createVideoBox = (id) => {
+            const canvas = document.createElement('canvas'); // Crea un canvas para renderizar el video
+            canvas.id = `video_${id}`; // Asigna un ID único basado en el usuario
+            canvas.width = 320; // Ancho del canvas
+            canvas.height = 240; // Alto del canvas
+            videosDiv.appendChild(canvas); // Agrega el canvas al contenedor
+            return canvas; // Devuelve el canvas creado
+        };
+
+        // Crear el cuadro para el video local
+        const localCanvas = createVideoBox('local'); // Canvas para el video local
+        const localContext = localCanvas.getContext('2d'); // Contexto para renderizar imágenes en el canvas
+
+        // Capturar video local desde la cámara
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false }) // Solicita acceso a la cámara
+            .then(stream => {
+                const localVideo = document.createElement('video'); // Crea un elemento video
+                localVideo.srcObject = stream; // Conecta el stream de la cámara
+                localVideo.play(); // Inicia la reproducción del video
+
+                // Función para enviar frames al servidor
+                const sendFrames = () => {
+                    localContext.drawImage(localVideo, 0, 0, localCanvas.width, localCanvas.height); // Dibuja el video en el canvas
+                    const frame = localCanvas.toDataURL('image/jpeg'); // Convierte el canvas a una imagen base64
+                    socket.emit('send_video', { frame }); // Envía el frame al servidor
+                    requestAnimationFrame(sendFrames); // Llama a la función de nuevo
+                };
+                sendFrames(); // Inicia el envío de frames
+            })
+            .catch(err => {
+                console.error('Error al acceder a la cámara:', err); // Manejo de errores
+                alert('No se pudo acceder a la cámara. Verifica los permisos.'); // Mensaje para el usuario
+            });
+
+        // Renderizar videos de otros usuarios
+        socket.on('receive_video', ({ id, frame }) => {
+            let remoteCanvas = document.getElementById(`video_${id}`); // Busca el canvas del usuario
+            if (!remoteCanvas) {
+                remoteCanvas = createVideoBox(id); // Si no existe, lo crea
+            }
+            const remoteContext = remoteCanvas.getContext('2d'); // Contexto del canvas
+            const img = new Image(); // Crea una imagen
+            img.onload = () => {
+                remoteContext.drawImage(img, 0, 0, remoteCanvas.width, remoteCanvas.height); // Dibuja la imagen en el canvas
+            };
+            img.src = frame; // Asigna la fuente de la imagen
+        });
+
+        // Notificar cuando un usuario se conecta
+        socket.on('user_connected', ({ id }) => {
+            console.log(`Usuario conectado: ${id}`); // Registro en la consola
+            showNotification(`Usuario conectado: ${id}`); // Muestra una notificación
+        });
+
+        // Notificar cuando un usuario se desconecta
+        socket.on('user_disconnected', ({ id }) => {
+            console.log(`Usuario desconectado: ${id}`); // Registro en la consola
+            showNotification(`Usuario desconectado: ${id}`); // Muestra una notificación
+            const remoteCanvas = document.getElementById(`video_${id}`); // Busca el canvas del usuario
+            if (remoteCanvas) {
+                remoteCanvas.remove(); // Elimina el canvas si existe
+            }
+        });
+
+        // Mostrar notificaciones en la interfaz
+        const showNotification = (message) => {
+            const notification = document.createElement('div'); // Crea un div para la notificación
+            notification.className = 'notification'; // Asigna la clase de notificación
+            notification.textContent = message; // Asigna el mensaje
+            document.body.appendChild(notification); // Agrega la notificación al cuerpo
+            setTimeout(() => {
+                notification.remove(); // Elimina la notificación después de 5 segundos
+            }, 5000);
+        };
+    </script>
+</body>
+</html>

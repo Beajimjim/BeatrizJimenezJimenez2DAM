@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <!-- Encabezado del documento. Aquí puedes incluir estilos y metadatos si es necesario. -->
+  </head>
+  <body>
+    <!-- Elemento de video para mostrar la transmisión en vivo de la cámara web. -->
+    <video id="video" width="320" height="240" autoplay></video>
+    
+    <!-- Elemento de canvas donde se dibujarán los fotogramas del video. -->
+    <canvas id="lienzo" width="320" height="240"></canvas>
+    
+    <script>
+        // Referencia al elemento de video en el DOM.
+        const video = document.getElementById('video');
+        // Referencia al elemento de canvas en el DOM.
+        const lienzo = document.getElementById('lienzo');
+        // Obtiene el contexto 2D del canvas, que se usará para dibujar en él.
+        const contexto = lienzo.getContext('2d');
+
+        // Solicita acceso a la cámara web del usuario.
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                // Si se obtiene el flujo de video correctamente, se asigna al elemento de video.
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                // Si ocurre un error (por ejemplo, permiso denegado), se muestra en la consola.
+                console.error('Error accessing webcam:', err);
+            });
+
+        // Función que dibuja el contenido del video en el canvas.
+        function drawToCanvas() {
+            // Dibuja el fotograma actual del video en el canvas.
+            contexto.drawImage(video, 0, 0, lienzo.width, lienzo.height);
+            // Llama a la función en el próximo cuadro de animación.
+            requestAnimationFrame(drawToCanvas);
+        }
+
+        // Cuando el video comienza a reproducirse, inicia el dibujo en el canvas.
+        video.addEventListener('play', () => {
+            drawToCanvas();
+        });
+    </script>
+  </body>
+</html>
+
+
+
+<!-- Este código HTML utiliza JavaScript para acceder a la cámara web del usuario, mostrar el video en tiempo real en un elemento <video> y dibujar fotogramas en un <canvas>. A continuación, explico brevemente cada parte:
+
+Estructura del código:
+Elementos HTML:
+
+<video>: Se usa para mostrar la transmisión en vivo de la cámara.
+<canvas>: Actúa como un lienzo donde se dibujarán los fotogramas del video.
+JavaScript:
+
+navigator.mediaDevices.getUserMedia: Solicita acceso a la cámara web del usuario.
+video.srcObject: Asigna la transmisión de la cámara al elemento de video.
+drawToCanvas: Función que copia los fotogramas del video en el lienzo de manera continua usando requestAnimationFrame.
+Flujo:
+El navegador solicita permiso para acceder a la cámara.
+Si se concede el permiso:
+La transmisión de la cámara se muestra en el elemento <video>.
+La función drawToCanvas dibuja cada fotograma en el <canvas> usando drawImage.
+Si el permiso es denegado o hay un error, se registra en la consola. -->

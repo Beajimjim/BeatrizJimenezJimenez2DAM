@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Enlace a un archivo externo que contiene las funciones de compresión y descompresión -->
+    <script src="funciones.js"></script>
+    <canvas></canvas>
+    <script>
+        // Obtengo una referencia al elemento `<canvas>` del DOM
+        const lienzo = document.querySelector("canvas"); // Selecciona el lienzo
+        const contexto = lienzo.getContext("2d");       // Obtiene el contexto de dibujo 2D
+
+        // Configuración del tamaño del lienzo
+        lienzo.width = 1920;  // Establece el ancho del lienzo en píxeles
+        lienzo.height = 1080; // Establece el alto del lienzo en píxeles
+
+        // Creación de un objeto `Image` para cargar una imagen externa
+        let imagen = new Image();             // Crea una nueva imagen
+        imagen.src = "../captura.png";        // Ruta de la imagen que se va a cargar
+
+        // Evento `onload` que se ejecuta cuando la imagen ha sido completamente cargada
+        imagen.onload = function () {
+            // Dibuja la imagen cargada en el lienzo
+            contexto.drawImage(imagen, 0, 0);
+
+            // Extrae los datos de píxeles de la imagen dibujada en el lienzo
+            const coleccion = contexto.getImageData(0, 0, 1920, 1080).data; // Obtiene un array RGBA
+            console.log("array original:");
+            console.log(coleccion); // Muestra el array de datos originales (RGBA)
+
+            // Compresión de los datos utilizando funciones externas
+            console.log("array comprimido:");
+            let comprimido = comprimir(coleccion); // Aplica la compresión a los datos
+            console.log(comprimido);              // Muestra los datos comprimidos
+
+            // Descompresión de los datos comprimidos para su reconstrucción
+            console.log("array descomprimido:");
+            let descomprimido = descomprimir(comprimido); // Descomprime los datos
+            console.log(descomprimido);                  // Muestra los datos descomprimidos
+
+            // Actualiza la imagen del lienzo con los datos descomprimidos
+            let datos = contexto.getImageData(0, 0, 1920, 1080); // Obtiene un objeto de datos para la imagen
+            for (let i = 0; i < datos.data.length; i++) {        // Recorre cada componente del array RGBA
+                datos.data[i] = descomprimido[i];               // Reemplaza los datos originales con los descomprimidos
+            }
+            contexto.putImageData(datos, 0, 0); // Dibuja la imagen reconstruida en el lienzo
+        };
+    </script>
+  </body>
+</html>
+
+<!-- Explicación detallada
+Cargar la imagen:
+
+Se utiliza un objeto Image para cargar una imagen externa desde una ruta especificada.
+El evento onload asegura que el código no se ejecutará hasta que la imagen haya sido completamente cargada.
+Obtener datos de la imagen:
+
+Se utiliza getImageData para extraer los datos de píxeles de la imagen en formato RGBA.
+Compresión:
+
+La función comprimir elimina el canal de transparencia (Alfa) y aplica compresión RLE a los datos RGB.
+Descompresión:
+
+La función descomprimir reconstruye los datos comprimidos en su formato original RGBA.
+Reconstrucción y renderizado:
+
+Una vez descomprimidos, los datos son reinsertados en un objeto ImageData utilizando un bucle que reemplaza cada valor RGBA.
+putImageData dibuja estos datos de píxeles en el lienzo, restaurando la imagen.
+ -->

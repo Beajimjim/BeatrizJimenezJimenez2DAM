@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <!-- Encabezado del documento. Aquí puedes incluir estilos y scripts adicionales si es necesario. -->
+  </head>
+  <body>
+    <!-- Elemento de video para mostrar la transmisión en vivo desde la cámara web. -->
+    <video id="video" width="160" height="120" autoplay></video>
+    
+    <!-- Elemento canvas donde se dibujarán los fotogramas del video. -->
+    <canvas id="lienzo" width="160" height="120"></canvas>
+    
+    <script>
+        // Referencia al elemento de video en el DOM.
+        const video = document.getElementById('video');
+        // Referencia al elemento canvas en el DOM.
+        const lienzo = document.getElementById('lienzo');
+        // Obtiene el contexto 2D del canvas, que se usará para dibujar y manipular imágenes.
+        const contexto = lienzo.getContext('2d');
+
+        // Solicita acceso a la cámara web del usuario.
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                // Si se obtiene el flujo de video correctamente, se asigna al elemento de video.
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                // Si ocurre un error (por ejemplo, permiso denegado), se muestra en la consola.
+                console.error('Error accessing webcam:', err);
+            });
+
+        // Función que dibuja el contenido del video en el canvas y procesa los datos de la imagen.
+        function drawToCanvas() {
+            // Dibuja el fotograma actual del video en el canvas.
+            contexto.drawImage(video, 0, 0, lienzo.width, lienzo.height);
+
+            // Captura los datos de los píxeles del canvas en un objeto ImageData.
+            let datos = contexto.getImageData(0, 0, 160, 120);
+            
+            // Imprime en la consola los datos del objeto ImageData.
+            // Contiene un arreglo de valores RGBA (rojo, verde, azul, alfa) de cada píxel.
+            console.log(datos);
+
+            // Llama a la función en el próximo cuadro de animación.
+            requestAnimationFrame(drawToCanvas);
+        }
+
+        // Cuando el video comienza a reproducirse, inicia el proceso de dibujo y análisis.
+        video.addEventListener('play', () => {
+            drawToCanvas();
+        });
+    </script>
+  </body>
+</html>
+
+
+<!-- Captura de datos de la imagen:
+
+contexto.getImageData(0, 0, 160, 120) obtiene un objeto ImageData con la información de los píxeles del área especificada del lienzo.
+Este objeto contiene:
+width: Ancho del área capturada.
+height: Alto del área capturada.
+data: Un arreglo de valores RGBA (rojo, verde, azul, alfa) para cada píxel.
+Impresión de datos en la consola:
+
+Se usa console.log(datos) para inspeccionar el objeto ImageData. Esto es útil para procesar imágenes, aplicar filtros o realizar análisis.
+Uso práctico:
+Procesamiento de imágenes: Los datos RGBA pueden usarse para modificar colores, aplicar filtros, detectar bordes, etc.
+Desarrollo de aplicaciones: Este enfoque es útil en aplicaciones de visión por computadora, realidad aumentada, reconocimiento facial, etc. -->

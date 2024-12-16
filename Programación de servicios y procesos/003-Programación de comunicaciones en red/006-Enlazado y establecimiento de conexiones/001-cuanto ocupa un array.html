@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      // Obtiene el uso inicial de memoria del heap de JavaScript al cargar la página
+      const inicial = performance.memory.usedJSHeapSize;
+
+      // Crea un arreglo llamado 'coleccion' con una lista de números
+      let coleccion = [1,2,3,4,5,6,7,8,543,534,353,453,543,53,534,534,53,45,345,345,3,54,35,345,345,34,534];
+
+      // Establece un retraso de 100 milisegundos para calcular la memoria utilizada
+      setTimeout(() => {
+        // Obtiene el uso final de memoria del heap de JavaScript
+        const final = performance.memory.usedJSHeapSize;
+
+        // Calcula la memoria utilizada restando el estado inicial del estado final
+        let memoriaUtilizada = final - inicial;
+
+        // Imprime en la consola la memoria utilizada por la operación
+        console.log(memoriaUtilizada);
+      }, 100); // Retraso de 100 ms para permitir que los datos se carguen correctamente
+    </script>
+  </body>
+</html>
+
+
+<!-- Explicación del Código
+performance.memory.usedJSHeapSize:
+
+Esta API mide la cantidad de memoria utilizada en el "heap" de JavaScript, que es donde se almacenan los objetos y datos dinámicos.
+usedJSHeapSize devuelve el tamaño actual en bytes de la memoria que está siendo utilizada.
+Inicialización de Memoria:
+
+const inicial = performance.memory.usedJSHeapSize;
+Guarda la cantidad de memoria utilizada en el momento en que la página carga.
+Colección de Datos:
+
+let coleccion = [...]
+Declara una lista de números que se almacena en la memoria como un arreglo.
+Retraso con setTimeout:
+
+El código espera 100 milisegundos antes de calcular nuevamente el uso de memoria. Esto permite que el navegador termine de procesar el arreglo o cualquier operación pendiente.
+Cálculo de Memoria Utilizada:
+
+const final = performance.memory.usedJSHeapSize;
+Obtiene la memoria utilizada después de que se ejecuta el código, incluido el arreglo.
+let memoriaUtilizada = final - inicial;
+Calcula la diferencia en memoria entre el momento inicial y el momento final.
+Salida en Consola:
+
+console.log(memoriaUtilizada);
+Imprime en la consola cuánta memoria adicional se utilizó para almacenar el arreglo o cualquier cambio que ocurrió en el heap.
+Qué Hace el Código
+Mide cuánta memoria ocupa la operación de crear el arreglo coleccion.
+Imprime el resultado en bytes después de 100 milisegundos. -->

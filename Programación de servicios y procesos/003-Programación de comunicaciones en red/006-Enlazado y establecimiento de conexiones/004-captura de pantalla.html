@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Canvas para renderizar la imagen -->
+    <canvas></canvas>
+    <script>
+      // Selecciona el elemento <canvas> del documento HTML
+      const lienzo = document.querySelector("canvas");
+
+      // Obtiene el contexto 2D del canvas para dibujar gráficos
+      const contexto = lienzo.getContext("2d");
+
+      // Define el ancho y alto del canvas en píxeles (1920x1080, resolución Full HD)
+      lienzo.width = 1920; // Ancho en píxeles
+      lienzo.height = 1080; // Alto en píxeles
+
+      // Crea un nuevo objeto de imagen
+      let imagen = new Image();
+
+      // Establece la fuente de la imagen que se cargará
+      imagen.src = "captura.png"; // Debe ser una imagen válida en la misma carpeta o un enlace accesible
+
+      // Define una función que se ejecutará cuando la imagen haya sido completamente cargada
+      imagen.onload = function () {
+        // Dibuja la imagen en el canvas a partir de la posición (0, 0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Obtiene el uso inicial de memoria del heap de JavaScript
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Extrae los datos de los píxeles de la imagen renderizada en el canvas
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Espera 100 milisegundos para medir el uso final de memoria
+        setTimeout(() => {
+          // Obtiene el uso final de memoria del heap de JavaScript
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la memoria utilizada restando el uso inicial del uso final
+          let memoriaUtilizada = final - inicial;
+
+          // Imprime la memoria utilizada en bytes en la consola
+          console.log(memoriaUtilizada);
+
+          // Imprime en la consola los datos de los píxeles de la imagen (arreglo RGBA)
+          console.log(coleccion);
+        }, 100); // Retraso de 100 ms para estabilizar las operaciones
+      };
+    </script>
+  </body>
+</html>
+
+
+<!-- Qué Hace Este Código
+Carga una imagen captura.png en un canvas de 1920x1080 píxeles.
+Dibuja la imagen en el canvas.
+Extrae los datos de los píxeles de la imagen dibujada.
+Mide el impacto en el uso de memoria antes y después de procesar los datos de la imagen.
+Imprime en la consola:
+La memoria utilizada (en bytes).
+Los valores RGBA de los píxeles de la imagen. -->

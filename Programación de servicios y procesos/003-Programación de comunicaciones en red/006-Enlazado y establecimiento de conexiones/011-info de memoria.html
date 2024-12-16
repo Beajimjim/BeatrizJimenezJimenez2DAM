@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Elemento <canvas> para renderizar gráficos e imágenes -->
+    <canvas></canvas>
+    <script>
+      // Apunta al elemento <canvas> en el DOM
+      const lienzo = document.querySelector("canvas"); // Obtenemos el lienzo del documento HTML
+
+      // Creamos un contexto 2D para dibujar en el lienzo
+      const contexto = lienzo.getContext("2d");
+
+      // Configuramos las dimensiones del lienzo
+      lienzo.width = 1920; // Ancho del lienzo en píxeles
+      lienzo.height = 1080; // Alto del lienzo en píxeles
+
+      // Creamos un objeto para cargar una imagen
+      let imagen = new Image(); // Nueva instancia de Image
+
+      // Establecemos la ruta de la imagen a cargar
+      imagen.src = "captura.png"; // Ruta de la imagen, debe ser accesible desde el navegador
+
+      // Cuando la imagen se haya cargado
+      imagen.onload = function () {
+        // Dibuja la imagen en el lienzo comenzando desde la esquina superior izquierda (0, 0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Obtiene los datos de los píxeles de la imagen renderizada en el lienzo
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Crea un array vacío para almacenar los valores RGB unificados
+        const sintransparencia = [];
+
+        // Itera sobre los datos de los píxeles (formato RGBA, 4 valores por píxel)
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Calcula un valor único para cada píxel combinando R, G y B (ignora A, transparencia)
+          sintransparencia.push(
+            coleccion[i] * 255 * 255 + // R tiene el mayor peso
+            coleccion[i + 1] * 255 +  // G tiene peso medio
+            coleccion[i + 2]          // B tiene el menor peso
+          );
+        }
+
+        // Medimos la memoria inicial antes de la compresión
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Comprime el array utilizando Run-Length Encoding (RLE)
+        comprimido = rleCompressArray(sintransparencia);
+
+        // Imprime el array comprimido para verificar el resultado
+        console.log(comprimido);
+
+        // Mide el uso de memoria después de un breve retraso
+        setTimeout(() => {
+          // Mide la memoria utilizada después del procesamiento
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la diferencia en el uso de memoria
+          let memoriaUtilizada = final - inicial;
+
+          // Muestra en la consola la memoria utilizada en bytes
+          console.log(memoriaUtilizada);
+        }, 100); // Espera 100 milisegundos para estabilizar la medición
+      };
+
+      // Función que aplica compresión Run-Length Encoding (RLE) a un array
+      function rleCompressArray(arr) {
+        const compressed = []; // Array para almacenar los datos comprimidos
+        let count = 1;         // Contador para las repeticiones de un valor
+
+        // Itera sobre el array desde el segundo elemento
+        for (let i = 1; i < arr.length; i++) {
+          if (arr[i] === arr[i - 1]) {
+            // Si el valor actual es igual al anterior, incrementa el contador
+            count++;
+          } else {
+            // Si el valor cambia, almacena el valor y el contador en el array comprimido
+            compressed.push([arr[i - 1], count]);
+            count = 1; // Reinicia el contador
+          }
+        }
+
+        // Agrega el último valor y su contador al array comprimido
+        compressed.push([arr[arr.length - 1], count]);
+
+        // Devuelve el array comprimido
+        return compressed;
+      }
+    </script>
+  </body>
+</html>
+
+<!-- Qué Hace Este Código
+Carga y dibuja una imagen (captura.png) en un lienzo de 1920x1080 píxeles.
+Extrae los datos RGBA de los píxeles de la imagen renderizada.
+Convierte los valores RGB de cada píxel en un único número entero, ignorando el canal Alfa.
+Comprime los datos del array usando el algoritmo RLE.
+Calcula e imprime el uso de memoria antes y después de realizar las operaciones.
+ -->

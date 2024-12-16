@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Canvas para renderizar la imagen -->
+    <canvas></canvas>
+    <script>
+      // Obtiene el elemento <canvas> del documento HTML
+      const lienzo = document.querySelector("canvas");
+
+      // Obtiene el contexto 2D del canvas para dibujar gráficos bidimensionales
+      const contexto = lienzo.getContext("2d");
+
+      // Define el tamaño del canvas: 1920 píxeles de ancho y 1080 píxeles de alto (resolución Full HD)
+      lienzo.width = 1920; // Ancho del canvas
+      lienzo.height = 1080; // Alto del canvas
+
+      // Crea un nuevo objeto de imagen
+      let imagen = new Image();
+
+      // Establece la ruta de la imagen a cargar
+      imagen.src = "captura.png"; // Asegúrate de que este archivo esté en la misma carpeta o en una ruta válida
+
+      // Define una función que se ejecuta cuando la imagen se ha cargado completamente
+      imagen.onload = function () {
+        // Dibuja la imagen cargada en el canvas en la posición (0, 0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Obtiene los datos de los píxeles de la imagen renderizada en el canvas
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Obtiene el uso inicial de memoria del heap de JavaScript
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Crea un nuevo arreglo para almacenar los valores RGB, excluyendo el canal de transparencia (A)
+        const sintransparencia = [];
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Agrega el valor del canal Rojo (R)
+          sintransparencia.push(coleccion[i]);
+
+          // Agrega el valor del canal Verde (G)
+          sintransparencia.push(coleccion[i + 1]);
+
+          // Agrega el valor del canal Azul (B)
+          sintransparencia.push(coleccion[i + 2]);
+          // El canal Alfa (A) se omite deliberadamente
+        }
+
+        // Calcula el uso de memoria después de un retraso de 100 milisegundos
+        setTimeout(() => {
+          // Obtiene el uso final de memoria del heap de JavaScript
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la memoria utilizada restando el estado inicial del estado final
+          let memoriaUtilizada = final - inicial;
+
+          // Imprime la memoria utilizada en bytes en la consola
+          console.log(memoriaUtilizada);
+
+          // Imprime los datos de los píxeles de la imagen (incluidos los canales RGBA)
+          console.log(coleccion);
+        }, 100); // Retraso de 100 ms para estabilizar las operaciones
+      };
+    </script>
+  </body>
+</html>
+<!-- Qué Hace Este Código
+Carga una imagen captura.png en un canvas de 1920x1080 píxeles.
+Dibuja la imagen en el canvas.
+Extrae los datos de píxeles de la imagen renderizada (valores RGBA).
+Filtra los valores para eliminar el canal Alfa y quedarse solo con los canales RGB.
+Mide e imprime la memoria utilizada por la operación.
+ -->

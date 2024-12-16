@@ -1,0 +1,138 @@
+/* Reset básico */
+body, ul {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Contenedor principal */
+.container {
+    display: flex;
+    width: 100%;
+}
+
+/* Menú lateral */
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    padding: 20px 10px;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1abc9c;
+    margin: 0;
+}
+
+.menu {
+    list-style: none;
+    width: 100%;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    transition: background 0.3s, color 0.3s;
+    cursor: pointer;
+}
+
+.menu-item .icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.menu-item:hover,
+.menu-item.active {
+    background-color: #1abc9c;
+    color: #2c3e50;
+}
+
+/* Contenido principal */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #ecf0f1;
+}
+
+h1 {
+    color: #2c3e50;
+}
+
+/* Formulario de Envío */
+.enviar-correo {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.enviar-correo input,
+.enviar-correo textarea {
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+}
+
+.enviar-correo button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.enviar-correo button:hover {
+    background-color: #2980b9;
+}
+
+/* Bandeja de Correos */
+.bandeja {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.correo-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.correo-item h3 {
+    margin: 0;
+    color: #3498db;
+}
+
+.correo-item p {
+    margin: 5px 0;
+}

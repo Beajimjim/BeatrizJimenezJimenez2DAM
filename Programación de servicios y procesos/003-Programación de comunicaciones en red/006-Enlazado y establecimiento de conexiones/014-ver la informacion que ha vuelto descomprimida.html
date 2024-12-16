@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Lienzo (canvas) para renderizar gráficos e imágenes -->
+    <canvas></canvas>
+    <script>
+      // **Función para comprimir los datos de imagen**
+      function comprimir(coleccion) {
+        ////////////////////// PRIMERO QUITO LA TRANSPARENCIA //////////////////////
+        const sintransparencia = []; // Creamos un array para almacenar los píxeles sin el canal alfa
+
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Iteramos por los píxeles (de 4 en 4 para RGBA)
+          sintransparencia.push(
+            coleccion[i] * 255 * 255 + coleccion[i + 1] * 255 + coleccion[i + 2]
+          ); // Combinamos los valores RGB en un único número y descartamos la transparencia
+        }
+
+        ////////////////////// LUEGO COMPRIMO USANDO RLE //////////////////////
+        const comprimido = rleCompressArray(sintransparencia); // Aplicamos compresión RLE
+        return comprimido; // Devolvemos el array comprimido
+      }
+
+      // **Función para descomprimir los datos comprimidos**
+      function descomprimir(coleccion) {
+        const desrle = rleDecompressArray(coleccion); // Descomprimimos el array con RLE
+        const descomprimido = new Uint8ClampedArray(desrle.length * 4); // Multiplicamos por 4 para RGBA
+        let j = 0;
+
+        for (let i = 0; i < desrle.length; i++) {
+          // Convertimos el valor unificado a sus componentes RGB
+          descomprimido[j++] = (desrle[i] >> 16) & 255; // Extraemos el rojo
+          descomprimido[j++] = (desrle[i] >> 8) & 255; // Extraemos el verde
+          descomprimido[j++] = desrle[i] & 255; // Extraemos el azul
+          descomprimido[j++] = 255; // Restauramos la transparencia fija (255)
+        }
+
+        return descomprimido; // Devolvemos el array descomprimido
+      }
+
+      // **Función para aplicar compresión RLE (Run-Length Encoding)**
+      function rleCompressArray(arr) {
+        const compressed = []; // Array para almacenar los datos comprimidos
+        let count = 1; // Contador de repeticiones del valor actual
+
+        for (let i = 1; i < arr.length; i++) {
+          if (arr[i] === arr[i - 1]) {
+            count++; // Si el valor actual es igual al anterior, incrementamos el contador
+          } else {
+            compressed.push([arr[i - 1], count]); // Guardamos el valor y la cantidad
+            count = 1; // Reiniciamos el contador
+          }
+        }
+
+        // Guardamos el último valor y su cantidad
+        compressed.push([arr[arr.length - 1], count]);
+        return compressed; // Devolvemos el array comprimido
+      }
+
+      // **Función para descomprimir un array comprimido usando RLE**
+      function rleDecompressArray(compressed) {
+        const decompressed = []; // Array para almacenar los datos descomprimidos
+
+        for (let i = 0; i < compressed.length; i++) {
+          const [value, count] = compressed[i]; // Extraemos el valor y la cantidad
+          for (let j = 0; j < count; j++) {
+            decompressed.push(value); // Expandimos el valor según su cantidad
+          }
+        }
+
+        return decompressed; // Devolvemos el array descomprimido
+      }
+
+      // **Configuración del lienzo (canvas)**
+      const lienzo = document.querySelector("canvas"); // Seleccionamos el elemento <canvas>
+      const contexto = lienzo.getContext("2d"); // Creamos un contexto 2D para dibujar
+
+      // Configuramos las dimensiones del lienzo
+      lienzo.width = 1920; // Anchura del lienzo en píxeles
+      lienzo.height = 1080; // Altura del lienzo en píxeles
+
+      // **Cargar y procesar una imagen**
+      let imagen = new Image(); // Creamos un nuevo objeto de imagen
+      imagen.src = "captura.png"; // Especificamos la ruta de la imagen
+
+      imagen.onload = function () {
+        contexto.drawImage(imagen, 0, 0); // Dibuja la imagen en el lienzo desde la esquina superior izquierda (0, 0)
+
+        // Obtén los datos de píxeles (RGBA) de la imagen renderizada en el lienzo
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        console.log("array original:");
+        console.log(coleccion); // Imprime el array original en la consola
+
+        // **Comprimir los datos**
+        console.log("array comprimido:");
+        let comprimido = comprimir(coleccion); // Comprime el array original
+        console.log(comprimido); // Imprime el array comprimido en la consola
+
+        // **Descomprimir los datos**
+        console.log("array descomprimido:");
+        let descomprimido = descomprimir(comprimido); // Descomprime el array comprimido
+        console.log(descomprimido); // Imprime el array descomprimido en la consola
+      };
+    </script>
+  </body>
+</html>
+<!-- Qué Hace Este Código
+Dibuja una imagen en el lienzo HTML: La imagen debe estar disponible en la misma carpeta con el nombre captura.png.
+Extrae los datos de píxeles RGBA: Usa el método getImageData del lienzo para obtener todos los píxeles.
+Aplica compresión RLE: Convierte los valores RGB en un formato comprimido eficiente.
+Descomprime los datos: Restaura los datos comprimidos al formato original (con un canal alfa fijo de 255).
+Imprime los datos en consola: Muestra los arrays originales, comprimidos y descomprimidos. -->

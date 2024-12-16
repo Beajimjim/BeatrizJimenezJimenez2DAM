@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Enlace al archivo externo que contiene las funciones de compresión y descompresión -->
+    <script src="funciones.js"></script>
+    
+    <!-- Lienzo (canvas) para renderizar gráficos o imágenes -->
+    <canvas></canvas>
+    
+    <script>
+      // **Selección del lienzo HTML**
+      const lienzo = document.querySelector("canvas"); // Obtenemos el elemento <canvas> del documento
+      const contexto = lienzo.getContext("2d"); // Creamos un contexto 2D para dibujar dentro del lienzo
+
+      // **Configuración del tamaño del lienzo**
+      lienzo.width = 1920; // Establecemos la anchura del lienzo a 1920 píxeles
+      lienzo.height = 1080; // Establecemos la altura del lienzo a 1080 píxeles
+
+      // **Creación y configuración de la imagen**
+      let imagen = new Image(); // Creamos un nuevo objeto de imagen
+      imagen.src = "../captura.png"; // Asignamos la ruta relativa de la imagen que queremos cargar
+
+      // **Evento de carga de la imagen**
+      imagen.onload = function () {
+        // Cuando la imagen haya cargado completamente:
+        contexto.drawImage(imagen, 0, 0); // Dibujamos la imagen en el lienzo, empezando en la esquina superior izquierda (0, 0)
+
+        // **Obtenemos los datos de píxeles de la imagen renderizada**
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data; 
+        // Extraemos los datos RGBA de todos los píxeles de la región especificada (todo el lienzo)
+        // El resultado es un array donde cada 4 valores representan Rojo, Verde, Azul y Alfa (transparencia).
+
+        console.log("array original:"); // Imprimimos un mensaje en la consola indicando que se mostrarán los datos originales
+        console.log(coleccion); // Mostramos el array original con los datos RGBA en la consola
+
+        console.log("array comprimido:"); // Mensaje indicando que se mostrarán los datos comprimidos
+        let comprimido = comprimir(coleccion); // Llamamos a la función `comprimir` (definida en funciones.js) para comprimir los datos
+        console.log(comprimido); // Mostramos el array comprimido en la consola
+
+        console.log("array descomprimido:"); // Mensaje indicando que se mostrarán los datos descomprimidos
+        let descomprimido = descomprimir(comprimido); // Llamamos a la función `descomprimir` (definida en funciones.js) para descomprimir los datos
+        console.log(descomprimido); // Mostramos el array descomprimido en la consola
+      };
+    </script>
+  </body>
+</html>
+
+
+<!-- Explicación del Flujo del Código
+Carga de Funciones Externas:
+
+El archivo funciones.js contiene las definiciones de las funciones comprimir y descomprimir. Este archivo debe estar disponible en la misma carpeta que este código.
+Inicialización del Lienzo:
+
+Se selecciona el lienzo HTML con document.querySelector.
+Se configura un contexto 2D para poder dibujar y manipular gráficos en el lienzo.
+Tamaño del Lienzo:
+
+Se define un tamaño de 1920 píxeles de ancho y 1080 píxeles de alto, equivalente a una resolución Full HD.
+Carga de Imagen:
+
+Se crea un objeto Image para cargar la imagen desde el archivo especificado (../captura.png).
+Cuando la imagen termina de cargarse (onload), se dibuja en el lienzo con drawImage.
+Extracción de Datos de Píxeles:
+
+Se usa getImageData para obtener todos los valores de color (RGBA) de la imagen renderizada.
+Los datos se almacenan en un array llamado coleccion.
+Compresión:
+
+Se llama a la función comprimir, que elimina el canal alfa y aplica compresión RLE (Run-Length Encoding) al array de píxeles.
+Descompresión:
+
+Se llama a la función descomprimir, que revierte el proceso de compresión y reconstruye el array original con los valores RGBA.
+Salida en Consola:
+
+Se imprime en consola el array original, el array comprimido y el array descomprimido para verificar los resultados y comparar.
+
+Resultado
+Este código carga una imagen en el lienzo HTML, extrae sus datos RGBA, los comprime usando RLE, los descomprime y muestra todos los resultados en la consola para verificar el proceso.
+
+
+
+
+
+
+-->

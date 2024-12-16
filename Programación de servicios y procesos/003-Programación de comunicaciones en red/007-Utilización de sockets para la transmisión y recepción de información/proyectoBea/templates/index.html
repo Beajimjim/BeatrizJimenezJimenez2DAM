@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Especifica la codificación de caracteres para UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Configuración para diseño adaptable -->
+    <title>Correo Electrónico</title> <!-- Título de la página -->
+    <link rel="stylesheet" href="../static/style.css"> <!-- Vincula el archivo CSS externo para el diseño -->
+</head>
+<body>
+    <div class="container">
+        <!-- Menú Lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Mi Correo</h1> <!-- Título del menú lateral -->
+            </div>
+            <ul class="menu">
+                <!-- Elementos del menú lateral -->
+                <li onclick="mostrarCarpeta('inbox')" class="menu-item active"> <!-- Carpeta de entrada -->
+                    <span class="icon">📥</span> <!-- Ícono de bandeja -->
+                    Bandeja de Entrada
+                </li>
+                <li onclick="mostrarCarpeta('sent')" class="menu-item"> <!-- Carpeta de enviados -->
+                    <span class="icon">✉️</span> <!-- Ícono de enviados -->
+                    Enviados
+                </li>
+                <li onclick="mostrarCarpeta('trash')" class="menu-item"> <!-- Carpeta de papelera -->
+                    <span class="icon">🗑️</span> <!-- Ícono de papelera -->
+                    Papelera
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <div class="main-content">
+            <!-- Formulario de Envío -->
+            <section class="enviar-correo">
+                <h1>Enviar Correo</h1> <!-- Título del formulario -->
+                <!-- Campos del formulario -->
+                <input type="text" id="asunto" placeholder="Asunto"> <!-- Campo para el asunto -->
+                <input type="text" id="para" placeholder="Para"> <!-- Campo para el destinatario -->
+                <textarea id="mensaje" placeholder="Escribe tu mensaje..."></textarea> <!-- Campo para el mensaje -->
+                <button id="enviar">Enviar</button> <!-- Botón para enviar -->
+            </section>
+
+            <!-- Bandeja de Correos -->
+            <section id="correos" class="bandeja">
+                <h1>Bandeja de Entrada</h1> <!-- Título inicial para la bandeja -->
+                <div id="lista-correos"></div> <!-- Contenedor dinámico para los correos -->
+            </section>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Cambiar entre carpetas
+        function mostrarCarpeta(carpeta) {
+            // Cambiar título según la carpeta seleccionada
+            const titulo = document.querySelector("#correos h1");
+            titulo.textContent = carpeta === "inbox" ? "Bandeja de Entrada" :
+                                 carpeta === "sent" ? "Enviados" : "Papelera";
+
+            // Actualizar la clase 'active' del menú lateral
+            document.querySelectorAll(".menu-item").forEach(item => item.classList.remove("active"));
+            document.querySelector(`.menu-item[onclick="mostrarCarpeta('${carpeta}')"]`).classList.add("active");
+
+            // Simulación: Mostrar correos de la carpeta seleccionada
+            fetch(`/recibir?carpeta=${carpeta}`) // Solicita correos al servidor según la carpeta
+                .then(response => response.json()) // Convierte la respuesta a JSON
+                .then(data => {
+                    const lista = document.getElementById("lista-correos"); // Selecciona el contenedor de correos
+                    lista.innerHTML = ""; // Limpia la bandeja actual
+                    data.forEach(correo => { // Itera sobre los correos recibidos
+                        const div = document.createElement("div");
+                        div.classList.add("correo-item"); // Agrega una clase CSS
+                        div.innerHTML = `
+                            <h3>${correo.asunto}</h3> <!-- Muestra el asunto -->
+                            <p><strong>De:</strong> ${correo.de}</p> <!-- Muestra el remitente -->
+                            <p>${correo.mensaje}</p> <!-- Muestra el mensaje -->
+                        `;
+                        lista.appendChild(div); // Añade el correo al contenedor
+                    });
+                });
+        }
+
+        // Enviar correo
+        document.getElementById("enviar").onclick = function () {
+            const data = {
+                asunto: document.getElementById("asunto").value, // Obtiene el asunto del formulario
+                para: document.getElementById("para").value, // Obtiene el destinatario del formulario
+                mensaje: document.getElementById("mensaje").value // Obtiene el mensaje del formulario
+            };
+            fetch("/enviar", { // Envía los datos al servidor mediante POST
+                method: "POST",
+                headers: { "Content-Type": "application/json" }, // Configura los encabezados
+                body: JSON.stringify(data) // Convierte los datos a JSON
+            })
+                .then(response => response.json()) // Convierte la respuesta a JSON
+                .then(data => alert(data.message)); // Muestra un mensaje con la respuesta
+        };
+
+        // Cargar bandeja por defecto
+        mostrarCarpeta("inbox"); // Carga la bandeja de entrada al iniciar
+    </script>
+</body>
+</html>

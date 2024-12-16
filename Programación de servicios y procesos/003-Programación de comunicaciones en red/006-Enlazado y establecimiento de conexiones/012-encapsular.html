@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Elemento <canvas> para renderizar gráficos e imágenes -->
+    <canvas></canvas>
+    <script>
+      // **Función principal para comprimir una colección de píxeles**
+      function comprimir(coleccion) {
+        //////////////////////	PRIMERO QUITO LA TRANSPARENCIA	//////////////////////
+        // Crear un array vacío para almacenar los valores de píxeles sin transparencia
+        const sintransparencia = [];
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Para cada píxel, ignora el canal Alfa (transparencia)
+          // Calcula un valor único combinando los valores RGB
+          sintransparencia.push(
+            coleccion[i] * 255 * 255 + // R (Rojo) con el mayor peso
+            coleccion[i + 1] * 255 +  // G (Verde) con peso medio
+            coleccion[i + 2]          // B (Azul) con peso menor
+          );
+        }
+
+        //////////////////////	LUEGO COMPRIMO RLE	//////////////////////
+        // Aplicar compresión RLE (Run-Length Encoding) al array sin transparencia
+        const comprimido = rleCompressArray(sintransparencia);
+
+        // Devolver el array comprimido
+        return comprimido;
+      }
+
+      // **Función para aplicar compresión Run-Length Encoding (RLE)**
+      function rleCompressArray(arr) {
+        const compressed = []; // Array para almacenar los datos comprimidos
+        let count = 1;         // Contador de repeticiones de un valor
+
+        // Iterar sobre el array a partir del segundo elemento
+        for (let i = 1; i < arr.length; i++) {
+          if (arr[i] === arr[i - 1]) {
+            // Si el valor actual es igual al anterior, incrementa el contador
+            count++;
+          } else {
+            // Si el valor cambia, guarda el valor y la cantidad de repeticiones en el array comprimido
+            compressed.push([arr[i - 1], count]);
+            count = 1; // Reinicia el contador
+          }
+        }
+
+        // Agregar el último valor y su contador al array comprimido
+        compressed.push([arr[arr.length - 1], count]);
+
+        // Devolver el array comprimido
+        return compressed;
+      }
+
+      // **Configuración del lienzo (canvas)**
+      const lienzo = document.querySelector("canvas"); // Seleccionamos el elemento <canvas>
+      const contexto = lienzo.getContext("2d");        // Creamos un contexto 2D para dibujar
+
+      // Configuramos las dimensiones del lienzo
+      lienzo.width = 1920; // Ancho del lienzo en píxeles
+      lienzo.height = 1080; // Alto del lienzo en píxeles
+
+      // **Cargar y dibujar una imagen en el lienzo**
+      let imagen = new Image(); // Creamos un nuevo objeto para cargar una imagen
+      imagen.src = "captura.png"; // Especificamos la ruta de la imagen
+
+      // Cuando la imagen se haya cargado
+      imagen.onload = function () {
+        contexto.drawImage(imagen, 0, 0); // Dibuja la imagen en el lienzo desde la esquina superior izquierda (0, 0)
+
+        // Obtén los datos de píxeles (RGBA) de la imagen renderizada en el lienzo
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Llama a la función `comprimir` para procesar y comprimir los datos
+        let comprimido = comprimir(coleccion);
+
+        // Muestra el array comprimido en la consola para verificar el resultado
+        console.log(comprimido);
+      };
+    </script>
+  </body>
+</html>
+
+<!--  Qué Hace Este Código
+Carga y dibuja una imagen en un lienzo de 1920x1080 píxeles.
+Extrae los datos de los píxeles (RGBA) y elimina el canal Alfa.
+Comprime los datos RGB resultantes usando el algoritmo Run-Length Encoding (RLE).
+Muestra el array comprimido en la consola.-->

@@ -1,0 +1,79 @@
+<!doctype> <!-- Declaración del tipo de documento HTML -->
+<html>
+<head>
+    <script src="funciones.js"></script> <!-- Incluye un archivo externo con funciones adicionales -->
+</head>
+<body>
+    <h1>Duckling</h1> <!-- Encabezado principal de la página -->
+    <canvas></canvas> <!-- Lienzo donde se dibujarán los datos recibidos -->
+    <script>
+        // Establece una conexión WebSocket con el servidor local en el puerto 3000
+        const socket = new WebSocket("http://localhost:5000");
+
+        // Selecciona el elemento canvas del documento
+        const lienzo = document.querySelector("canvas");
+
+        // Obtiene el contexto 2D del lienzo para dibujar
+        const contexto = lienzo.getContext("2d");
+
+        // Define el tamaño del lienzo
+        lienzo.width = 1920; // Ancho del lienzo
+        lienzo.height = 1080; // Altura del lienzo
+
+        ///////////////////////////////// ABRO CONEXIÓN DE SOCKET //////////////////////////////
+
+        // Evento que se ejecuta cuando se abre correctamente la conexión WebSocket
+        socket.addEventListener("open", (event) => {
+            console.log("WebSocket connection opened"); // Muestra un mensaje en la consola indicando que la conexión está abierta
+        });
+
+        // Evento que se ejecuta si ocurre algún error en la conexión WebSocket
+        socket.addEventListener("error", (event) => {
+            console.error("WebSocket error:", event); // Imprime el error en la consola
+        });
+
+        ///////////////////////////////// RECIBO MENSAJES DEL SOCKET //////////////////////////////
+
+        // Evento que se ejecuta cuando el servidor envía un mensaje al cliente
+        socket.addEventListener("message", (event) => {
+            let datos = JSON.parse(event.data); // Convierte los datos recibidos del servidor de texto JSON a un objeto JavaScript
+            
+            // Descomprime los datos recibidos
+            descomprimido = descomprimir(datos);
+
+            // Obtiene los datos actuales del lienzo
+            let datosimagen = contexto.getImageData(0, 0, 1920, 1080);
+
+            // Recorre los datos descomprimidos y los asigna a los datos del lienzo
+            for (let i = 0; i < datosimagen.data.length; i++) {
+                datosimagen.data[i] = descomprimido[i]; // Asigna cada byte de los datos descomprimidos
+            }
+
+            // Actualiza el lienzo con los nuevos datos de imagen
+            contexto.putImageData(datosimagen, 0, 0);
+        });
+
+        ///////////////////////////////// FIN DE LA RECEPCIÓN DE MENSAJES DEL SOCKET //////////////////////////////
+    </script>
+</body>
+</html>
+<!-- Explicación Detallada:
+Conexión WebSocket:
+
+Se conecta al servidor WebSocket en ws://localhost:3000.
+Maneja eventos de conexión (open) y errores (error) para registrar mensajes en la consola.
+Recepción de Mensajes:
+
+Al recibir un mensaje desde el servidor, este se procesa en el evento message.
+El mensaje se interpreta como un JSON y se descomprime usando la función descomprimir.
+Manipulación del Lienzo:
+
+Los datos descomprimidos se aplican al lienzo (canvas) usando el método getImageData para modificar píxeles.
+Cada valor recibido reemplaza los valores actuales del lienzo.
+Finalmente, se actualiza el lienzo con los nuevos datos usando putImageData.
+Función descomprimir:
+
+Aunque no está incluida en el código, se espera que esta funcione para reconstruir los datos comprimidos en formato RGB o RGBA.
+Casos de Uso:
+Este código es útil para transmitir y mostrar datos gráficos, como video comprimido o imágenes en tiempo real desde un servidor.
+Puede emplearse en aplicaciones de visualización remota, sistemas de monitoreo o proyectos de transmisión en vivo. -->

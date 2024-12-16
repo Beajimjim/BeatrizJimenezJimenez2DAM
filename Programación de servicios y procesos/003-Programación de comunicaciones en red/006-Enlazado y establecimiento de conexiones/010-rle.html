@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Lienzo para renderizar imágenes -->
+    <canvas></canvas>
+    <script>
+      // Apuntamos al elemento <canvas> en el DOM
+      const lienzo = document.querySelector("canvas");
+      
+      // Creamos un contexto 2D para dibujar gráficos en el lienzo
+      const contexto = lienzo.getContext("2d");
+      
+      // Configuramos las dimensiones del lienzo: 1920 píxeles de ancho y 1080 píxeles de alto
+      lienzo.width = 1920;  // Anchura del lienzo
+      lienzo.height = 1080; // Altura del lienzo
+
+      // Creamos un nuevo objeto para cargar una imagen
+      let imagen = new Image();
+
+      // Especificamos la fuente de la imagen
+      imagen.src = "captura.png"; // Ruta de la imagen (asegúrate de que sea válida)
+
+      // Cuando la imagen haya cargado
+      imagen.onload = function () {
+        // Dibuja la imagen en el lienzo, comenzando desde la posición (0, 0)
+        contexto.drawImage(imagen, 0, 0);
+
+        // Obtén los datos de píxeles (RGBA) de la imagen renderizada en el lienzo
+        const coleccion = contexto.getImageData(0, 0, 1920, 1080).data;
+
+        // Crea un nuevo array vacío para almacenar los valores unificados (sin canal Alfa)
+        const sintransparencia = [];
+
+        // Itera sobre cada píxel (pasos de 4 porque los datos están en formato RGBA)
+        for (let i = 0; i < coleccion.length; i += 4) {
+          // Calcula un valor unificado combinando R, G y B (ignora A, canal de transparencia)
+          sintransparencia.push(
+            coleccion[i] * 255 * 255 +  // R (Rojo) con el mayor peso
+            coleccion[i + 1] * 255 +   // G (Verde) con peso medio
+            coleccion[i + 2]           // B (Azul) con peso menor
+          );
+        }
+
+        // Obtén la memoria usada antes de procesar (inicial)
+        const inicial = performance.memory.usedJSHeapSize;
+
+        // Espera 100 ms antes de medir la memoria después del procesamiento
+        setTimeout(() => {
+          // Obtén la memoria usada después de procesar (final)
+          const final = performance.memory.usedJSHeapSize;
+
+          // Calcula la memoria utilizada durante la operación
+          let memoriaUtilizada = final - inicial;
+
+          // Imprime en la consola la memoria utilizada en bytes
+          console.log(memoriaUtilizada);
+
+          // Imprime en la consola el array con los valores combinados de los píxeles
+          console.log(sintransparencia);
+
+          // Comprime el array sintransparencia usando la compresión RLE
+          comprimido = rleCompressArray(sintransparencia);
+
+          // Imprime en la consola el array comprimido
+          console.log(comprimido);
+        }, 100);
+      };
+
+      // Función para aplicar compresión RLE (Run-Length Encoding) a un array
+      function rleCompressArray(arr) {
+        const compressed = []; // Array para almacenar los datos comprimidos
+        let count = 1;         // Contador de repeticiones de un valor
+
+        // Itera por el array
+        for (let i = 1; i < arr.length; i++) {
+          if (arr[i] === arr[i - 1]) {
+            // Si el valor actual es igual al anterior, incrementa el contador
+            count++;
+          } else {
+            // Si el valor cambia, guarda el valor y la cantidad de repeticiones
+            compressed.push([arr[i - 1], count]);
+            count = 1; // Reinicia el contador
+          }
+        }
+
+        // Agrega el último valor al array comprimido
+        compressed.push([arr[arr.length - 1], count]);
+
+        // Devuelve el array comprimido
+        return compressed;
+      }
+    </script>
+  </body>
+</html>
+
+
+<!-- Qué Hace Este Código
+Carga y dibuja una imagen (captura.png) en un lienzo de 1920x1080 píxeles.
+Extrae los datos RGBA de los píxeles de la imagen renderizada.
+Combina los valores RGB en un único número entero por píxel.
+Calcula el impacto en la memoria del heap de JavaScript.
+Comprime los datos usando RLE para reducir el tamaño del arreglo y optimizar el almacenamiento. -->
