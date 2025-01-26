@@ -1,0 +1,47 @@
+nav ul{
+  list-style-type:none;
+  padding:10px;
+}
+nav ul li{
+  padding:15px;
+  cursor:pointer;
+}
+main nav {
+  overflow-y: auto; /* Independent scrolling for nav if needed */
+  background: #985277;
+  color: white;
+}
+main nav{
+	background:#985277;
+	color:white;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: stretch;
+	align-content: stretch;
+}
+
+/* Estilo del botón */
+#volver {
+    background-color: #857a80; /* Color rojo llamativo */
+    color: white; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Animaciones suaves */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+/* Efecto hover */
+#volver:hover {
+    background-color: #4d464a; /* Color más oscuro al pasar el ratón */
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño */
+}
+
+/* Efecto clic */
+#volver:active {
+    transform: scale(0.95); /* Reduce ligeramente el tamaño */
+}

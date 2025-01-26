@@ -1,0 +1,134 @@
+/* Definición de fuente personalizada */
+@font-face {
+  font-family: Ubuntu; /* Nombre de la fuente que se usará en el CSS */
+  src: url(../Ubuntu-R.ttf); /* Ruta al archivo de la fuente */
+}
+
+/* Estilo global para los elementos <html> y <body> */
+html, body { 
+  margin: 0px; /* Quitar márgenes predeterminados del navegador */
+  background: #985277; /* Color de fondo morado */
+  color: white; /* Color de texto blanco */
+  font-family: Ubuntu, sans-serif; /* Usar la fuente Ubuntu como principal */
+  text-align: center; /* Centrar todo el texto dentro del documento */
+}
+
+/* Estilo principal para el contenedor <main> */
+main {
+  box-sizing: border-box; /* Incluir padding y borde en el cálculo del ancho y alto */
+  padding: 20px; /* Espaciado interno */
+  display: grid; /* Configuración de diseño en cuadrícula */
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); /* Generar columnas de un tamaño mínimo de 12.5rem y ajustarlas dinámicamente */
+  grid-auto-rows: calc(16.5rem * 9 / 16); /* Altura de las filas según la proporción 16:9 */
+  gap: 10px; /* Espaciado entre los elementos de la cuadrícula */
+  padding: 40px; /* Espaciado interno adicional */
+  transform-style: preserve-3d; /* Mantener el efecto 3D en las transformaciones */
+  transition: transform 0.1s ease; /* Transición suave en las transformaciones */
+  width: 100%; /* Ancho completo del contenedor */
+}
+
+/* Estilo para cada elemento de la clase .aplicacion */
+.aplicacion {
+  border: 0px solid #fff; /* Borde transparente */
+  display: block; /* Mostrar como bloque */
+  align-items: center; /* Centrar elementos verticalmente */
+  justify-content: center; /* Centrar elementos horizontalmente */
+  font-size: 1.5rem; /* Tamaño de fuente */
+  text-align: center; /* Centrar texto */
+  background-size: cover; /* Asegurar que el fondo cubra completamente */
+  background-position: center; /* Centrar la posición del fondo */
+  opacity: 0.7; /* Hacer el elemento ligeramente translúcido */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Animaciones suaves en opacidad y transformaciones */
+  background: white; /* Fondo blanco */
+  position: relative; /* Posicionamiento relativo para manejar elementos hijos */
+  cursor: pointer; /* Cambiar el cursor a mano cuando se pasa sobre el elemento */
+  border-radius: 5px; /* Bordes redondeados */
+  color: #985277; /* Color de texto morado */
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.3); /* Sombra inicial sin desplazamiento */
+  transition: all 1s; /* Transición suave en todos los cambios de estilo */
+}
+
+/* Estilo para el ícono dentro de .aplicacion */
+.icono {
+  font-size: 72px; /* Tamaño grande para el ícono */
+  width: 100%; /* Ancho completo */
+  font-weight: bold; /* Texto en negrita */
+}
+
+header {
+  display: grid;
+  grid-template-columns: auto 1fr; /* Dos columnas: logo y contenido flexible */
+  align-items: center;
+  height: 5rem; /* Altura del header */
+  background-color: #985277; /* Color de fondo */
+  padding: 0 1rem;
+  color: white; /* Color del texto */
+}
+
+#logo {
+  height: 4rem; /* Tamaño del logo */
+}
+
+#user-section {
+  display: grid;
+  grid-template-rows: 1fr 1fr; /* Dos filas: nombre de usuario e ícono */
+  justify-items: end; /* Alinear contenido a la derecha */
+  align-items: center; /* Centrar verticalmente las filas */
+}
+
+#nombre {
+  font-size: 1rem;
+}
+
+#cerrarsesion {
+  height: 2rem; /* Tamaño del ícono */
+  cursor: pointer; /* Cambiar cursor al pasar sobre el ícono */
+}
+
+/* Estilo para el logotipo */
+
+
+/* Estilo adicional cuando el mouse pasa sobre .aplicacion */
+.aplicacion:hover {
+  opacity: 1; /* Aumentar opacidad al 100% */
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3); /* Añadir sombra más pronunciada */
+}
+
+
+
+
+
+
+/* Explicación de las secciones
+Fuente personalizada (@font-face):
+
+Define la fuente "Ubuntu" para usarla en los estilos.
+Especifica la ruta al archivo de la fuente.
+Estilo global (html, body):
+
+Configura el fondo, el texto y el espaciado general del documento.
+Diseño del contenedor principal (main):
+
+Utiliza CSS Grid para organizar los elementos en una cuadrícula.
+Las columnas y filas se ajustan automáticamente según el contenido.
+Incluye un efecto de transición y soporte para transformaciones 3D.
+Estilo de las aplicaciones (.aplicacion):
+
+Cada elemento tiene un diseño con fondo blanco, texto morado y bordes redondeados.
+Incluye efectos visuales como opacidad reducida y sombras suaves.
+Cambia la apariencia al pasar el cursor sobre el elemento (:hover).
+Íconos (.icono):
+
+Los íconos tienen un tamaño grande y negrita para destacar.
+Logotipo (#logo):
+
+El logotipo se limita a un ancho de 300px.
+Efecto al pasar el cursor (:hover):
+
+Aumenta la opacidad y la sombra del elemento, haciéndolo más destacado.
+Resultado
+Este CSS:
+
+Define un diseño atractivo y moderno para una cuadrícula de aplicaciones.
+Asegura una experiencia interactiva con animaciones suaves y efectos visuales.
+Proporciona un diseño limpio y bien estructurado para interfaces de usuario. */
