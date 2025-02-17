@@ -1,0 +1,5 @@
+{
+    "host": "217.154.4.86",
+    "port": 3000,
+    "message_file": "mensajes.txt"
+}

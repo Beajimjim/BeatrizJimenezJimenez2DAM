@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendario Anual de Reservas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .calendario {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        }
+        .mes {
+            border: 1px solid #ddd;
+            padding: 5px;
+            width: 250px; /* ancho fijo para cada mes */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            background-color: #fff;
+        }
+        h3 {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        th, td {
+            padding: 2px;
+            text-align: center;
+            border: 1px solid #ddd;
+            width: 14.28%; /* 100/7 para 7 columnas */
+            height: 25px;  /* altura fija para cada celda */
+        }
+        th {
+            background-color: #f4f4f4;
+            font-size: 10px;
+        }
+        .dia {
+            font-size: 10px;
+        }
+        @media (max-width: 1000px) {
+            .mes { width: calc(100% / 3 - 10px); }
+        }
+        @media (max-width: 750px) {
+            .mes { width: calc(100% / 2 - 10px); }
+        }
+        @media (max-width: 500px) {
+            .mes { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <h2> Calendario Anual de Reservas</h2>
+    <div class="calendario" id="calendario"></div>
+
+    <script>
+        // Obtenemos los datos de reservas (formato: [{"fecha": "YYYY-MM-DD", "cantidad": N}, ...])
+        fetch("/flask/reservas_calendario")
+            .then(response => response.json())
+            .then(data => {
+                // Procesamos los datos en un objeto { "YYYY-MM-DD": cantidad }
+                const reservas = {};
+                let maxReservas = 1;  // para normalizar la intensidad de color
+
+                data.forEach(item => {
+                    reservas[item.fecha] = item.cantidad;
+                    if (item.cantidad > maxReservas) {
+                        maxReservas = item.cantidad;
+                    }
+                });
+
+                // Nombres de meses y días (usamos Lunes como primer día)
+                const meses = [
+                    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                ];
+                const diasSemana = ["L", "M", "X", "J", "V", "S", "D"];
+
+                const calendarioDiv = document.getElementById("calendario");
+                const year = new Date().getFullYear();
+
+                // Para cada mes, crear una tabla fija de 7 columnas x 6 filas
+                for (let mes = 0; mes < 12; mes++) {
+                    const mesDiv = document.createElement("div");
+                    mesDiv.className = "mes";
+
+                    const titulo = document.createElement("h3");
+                    titulo.textContent = meses[mes] + " " + year;
+                    mesDiv.appendChild(titulo);
+
+                    const tabla = document.createElement("table");
+                    // Cabezera con días de la semana
+                    const thead = document.createElement("thead");
+                    const trHead = document.createElement("tr");
+                    diasSemana.forEach(dia => {
+                        const th = document.createElement("th");
+                        th.textContent = dia;
+                        trHead.appendChild(th);
+                    });
+                    thead.appendChild(trHead);
+                    tabla.appendChild(thead);
+
+                    const tbody = document.createElement("tbody");
+
+                    // Calculamos cuántos días tiene el mes
+                    const firstDay = new Date(year, mes, 1);
+                    const numDays = new Date(year, mes + 1, 0).getDate();
+
+                    // Ajustamos para que Lunes sea el primer día:
+                    // getDay() devuelve 0 para domingo, 1 para lunes, etc.
+                    // Convertimos: lunes -> 0, martes -> 1, ... domingo -> 6
+                    let startCol = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+
+                    // Generamos 6 filas (42 celdas) fijas
+                    let dayCounter = 1;
+                    for (let row = 0; row < 6; row++) {
+                        const tr = document.createElement("tr");
+                        for (let col = 0; col < 7; col++) {
+                            const td = document.createElement("td");
+                            // Calcular el índice de celda
+                            const cellIndex = row * 7 + col;
+                            if (cellIndex >= startCol && dayCounter <= numDays) {
+                                td.textContent = dayCounter;
+                                td.className = "dia";
+
+                                // Obtener la fecha en formato YYYY-MM-DD
+                                const fechaStr = `${year}-${(mes + 1).toString().padStart(2, '0')}-${dayCounter.toString().padStart(2, '0')}`;
+                                const cantidad = reservas[fechaStr] || 0;
+
+                                // Calcular la intensidad: más reservas = más rojo (intensidad 255) y menos reservas = más blanco
+                                let intensidad = Math.round((cantidad / maxReservas) * 255);
+                                // Para un gradiente de rojo (255,0,0) a blanco (255,255,255)
+                                let cellColor = `rgb(255, ${255 - intensidad}, ${255 - intensidad})`;
+                                td.style.backgroundColor = cellColor;
+                                td.style.color = "black";
+                                dayCounter++;
+                            } else {
+                                td.textContent = "";  // Celda vacía
+                            }
+                            tr.appendChild(td);
+                        }
+                        tbody.appendChild(tr);
+                    }
+                    tabla.appendChild(tbody);
+                    mesDiv.appendChild(tabla);
+                    calendarioDiv.appendChild(mesDiv);
+                }
+            })
+            .catch(error => console.error("Error al obtener datos:", error));
+    </script>
+
+</body>
+</html>

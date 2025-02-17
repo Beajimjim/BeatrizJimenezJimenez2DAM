@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Texto Predictivo</title>
+  <style>
+    /* Estilos generales del cuerpo */
+    body {
+      font-family: Arial, sans-serif;
+      background: #1a1a1a; /* Fondo oscuro */
+      color: white; /* Texto en color blanco */
+      text-align: center; /* Alineación centrada */
+      padding: 20px; /* Espaciado */
+    }
+
+    /* Estilos del título principal */
+    h1 {
+      font-size: 24px; /* Tamaño de fuente */
+      margin-bottom: 20px; /* Espaciado inferior */
+      color: #88c057; /* Color verde */
+    }
+
+    /* Estilos del cuadro de texto donde el usuario escribe */
+    #entrada {
+      width: 80%; /* Ancho ajustable */
+      max-width: 400px; /* Máximo de 400px */
+      min-height: 50px; /* Altura mínima */
+      font-size: 16px; /* Tamaño de texto */
+      padding: 12px; /* Espaciado interno */
+      border: 2px solid #444; /* Borde gris oscuro */
+      background: #222; /* Fondo oscuro */
+      color: white; /* Texto en color blanco */
+      border-radius: 8px; /* Bordes redondeados */
+      outline: none; /* Quitar borde al seleccionar */
+      display: block; /* Asegurar que se muestre como bloque */
+      margin: 20px auto; /* Centrar el input */
+      text-align: left; /* Alineación del texto */
+    }
+
+    /* Cambio de color cuando el cuadro de texto está enfocado */
+    #entrada:focus {
+      border-color: #88c057; /* Cambia a verde */
+    }
+
+    /* Lista donde se mostrarán las sugerencias */
+    #resultados {
+      list-style: none; /* Quita los puntos de la lista */
+      padding: 0;
+      max-width: 400px; /* Máximo ancho */
+      margin: auto; /* Centrado */
+      text-align: left; /* Alineación a la izquierda */
+    }
+
+    /* Estilos para cada sugerencia de la lista */
+    #resultados li {
+      background: #222; /* Fondo oscuro */
+      padding: 10px; /* Espaciado interno */
+      margin: 5px 0; /* Espaciado entre elementos */
+      border: 1px solid #444; /* Borde gris */
+      border-radius: 5px; /* Bordes redondeados */
+      cursor: pointer; /* Cursor de selección */
+      transition: background 0.2s; /* Transición de color */
+      color: white; /* Texto en color blanco */
+    }
+
+    /* Efecto cuando el usuario pasa el mouse sobre una sugerencia */
+    #resultados li:hover {
+      background: #88c057; /* Fondo verde */
+      color: black; /* Texto negro */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Título principal de la página -->
+  <h1>Texto Predictivo</h1>
+
+  <!-- Cuadro de texto donde el usuario escribe -->
+  <div contenteditable="true" id="entrada" placeholder="Escribe algo..."></div>
+
+  <!-- Lista donde aparecerán las sugerencias de palabras -->
+  <ul id="resultados"></ul>
+
+  <script>
+    // Capturar elementos del DOM
+    const entrada = document.getElementById("entrada");
+    const listaResultados = document.getElementById("resultados");
+
+    /**
+     * Función que realiza la búsqueda de predicciones
+     */
+    function busca() {
+      let contenido = entrada.textContent.trim(); // Obtener el texto sin espacios extra
+      let palabras = contenido.split(" "); // Separar en palabras
+      let dosultimas = palabras.slice(-2).join(" ").trim(); // Obtener las últimas dos palabras
+
+      // Si el usuario ha escrito menos de 2 caracteres, no se realiza búsqueda
+      if (dosultimas.length < 2) return;
+
+      let codificado = encodeURIComponent(dosultimas); // Codificar texto para la URL
+
+      // Realizar la petición a predictivo2.php con el input del usuario
+      fetch("predictivo2.php?entrada=" + codificado)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Error en la petición: " + response.statusText);
+          }
+          return response.json();
+        })
+        .then(datos => {
+          console.log("Respuesta del servidor:", datos); // Depuración en la consola
+          listaResultados.innerHTML = ""; // Limpiar lista anterior
+
+          // Si hay un error en la respuesta, mostrarlo en la consola
+          if (datos.error) {
+            console.error("Error en JSON:", datos.error);
+          } 
+          // Si hay predicciones disponibles, agregarlas a la lista
+          else if (Array.isArray(datos.predicciones) && datos.predicciones.length > 0) {
+            datos.predicciones.forEach(palabra => {
+              let item = document.createElement("li"); // Crear un elemento de lista
+              item.textContent = palabra; // Asignar el texto de la predicción
+              
+              // Al hacer clic en una sugerencia, se agrega al texto del usuario
+              item.addEventListener("click", () => {
+                entrada.textContent += " " + palabra;
+                listaResultados.innerHTML = ""; // Limpiar la lista tras la selección
+              });
+
+              listaResultados.appendChild(item); // Agregar el elemento a la lista
+            });
+          }
+        })
+        .catch(error => console.error("Fetch error:", error)); // Capturar errores
+    }
+
+    // Ejecutar la búsqueda cada vez que el usuario escriba algo
+    entrada.addEventListener("input", busca);
+  </script>
+</body>
+</html>

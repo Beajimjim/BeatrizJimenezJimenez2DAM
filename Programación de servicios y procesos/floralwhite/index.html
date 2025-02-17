@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagrama Sankey</title>
+  <link rel="stylesheet" href="jocarsafloralwhite.css"> <!-- Archivo CSS para estilos -->
+</head>
+<body>
+  <h2>Configurador de Sankey</h2>
+
+  <!-- Sección para agregar nodos a la Columna A -->
+  <div>
+    <h3>Agregar Columna A</h3>
+    <label>Nombre en Columna A:</label>
+    <input type="text" id="colA-name">
+    <button onclick="addNode('colA')">Agregar a Columna A</button>
+    
+    <!-- Sección para agregar nodos a la Columna B -->
+    <h3>Agregar Columna B</h3>
+    <label>Nombre en Columna B:</label>
+    <input type="text" id="colB-name">
+    <button onclick="addNode('colB')">Agregar a Columna B</button>
+  </div>
+
+  <!-- Sección para agregar enlaces entre las columnas -->
+  <h3>Agregar Enlaces (Columna A → Columna B)</h3>
+  <label>Columna A:</label>
+  <select id="source-colA"></select> <!-- Selector de nodos de Columna A -->
+  <label>Columna B:</label>
+  <select id="target-colB"></select> <!-- Selector de nodos de Columna B -->
+  <label>Valor:</label>
+  <input type="number" id="link-value" min="1"> <!-- Campo para ingresar valor de conexión -->
+  <button onclick="addLink()">Agregar Enlace</button>
+
+  <br><br>
+  <button onclick="updateChart()">Actualizar Gráfico</button>
+  <button onclick="clearLocalStorage()">Borrar Datos Guardados</button>
+
+  <!-- Contenedor donde se renderizará el diagrama Sankey -->
+  <h3>Diagrama Sankey</h3>
+  <div id="chart-container"></div>
+
+  <script src="jocarsafloralwhite.js"></script> <!-- Archivo JS que maneja el gráfico Sankey -->
+  <script>
+    // Objeto que almacena los nodos y enlaces del diagrama Sankey
+    let sankeyData = { nodes: [], links: [] };
+
+    // Función para guardar los datos en LocalStorage (persistencia en el navegador)
+    function saveToLocalStorage() {
+      localStorage.setItem("sankeyData", JSON.stringify(sankeyData));
+    }
+
+    // Función para cargar datos guardados desde LocalStorage
+    function loadFromLocalStorage() {
+      const savedData = localStorage.getItem("sankeyData");
+      if (savedData) {
+        sankeyData = JSON.parse(savedData);
+        updateNodeSelectors(); // Actualizar las opciones en los selectores
+        updateChart(); // Actualizar la visualización del gráfico
+      }
+    }
+
+    // Función para agregar nodos a las columnas A o B
+    function addNode(type) {
+      // Obtener el nombre del nodo ingresado por el usuario
+      let name = type === "colA" 
+        ? document.getElementById("colA-name").value 
+        : document.getElementById("colB-name").value;
+      
+      // Asignar un color diferente según la columna
+      let color = type === "colA" ? "#1f77b4" : "#ff7f0e";
+
+      // Validar que el usuario haya ingresado un nombre
+      if (!name) {
+        alert("Debe ingresar un nombre.");
+        return;
+      }
+
+      // Agregar el nodo al conjunto de datos
+      sankeyData.nodes.push({ name, color });
+
+      // Agregar la opción en el selector correspondiente
+      let option = new Option(name, sankeyData.nodes.length - 1);
+      if (type === "colA") {
+        document.getElementById("source-colA").add(option);
+      } else {
+        document.getElementById("target-colB").add(option);
+      }
+
+      // Limpiar el campo de entrada después de agregar el nodo
+      if (type === "colA") {
+        document.getElementById("colA-name").value = "";
+      } else {
+        document.getElementById("colB-name").value = "";
+      }
+
+      // Guardar los cambios en LocalStorage
+      saveToLocalStorage();
+    }
+
+    // Función para agregar un enlace entre los nodos de Columna A y B
+    function addLink() {
+      let source = document.getElementById("source-colA").value; // Nodo de origen
+      let target = document.getElementById("target-colB").value; // Nodo de destino
+      let value = parseInt(document.getElementById("link-value").value); // Valor de conexión
+
+      // Validar que se haya seleccionado un nodo en ambas columnas
+      if (source === "" || target === "") {
+        alert("Debe seleccionar un elemento de la Columna A y otro de la Columna B.");
+        return;
+      }
+
+      // Validar que el valor sea un número válido
+      if (!value || value < 1) {
+        alert("Debe ingresar un valor válido.");
+        return;
+      }
+
+      // Agregar el enlace a la estructura de datos
+      sankeyData.links.push({
+        source: parseInt(source),
+        target: parseInt(target),
+        value: value
+      });
+
+      // Limpiar el campo de valor
+      document.getElementById("link-value").value = "";
+
+      // Guardar los cambios en LocalStorage
+      saveToLocalStorage();
+    }
+
+    // Función para actualizar los selectores de nodos en la interfaz
+    function updateNodeSelectors() {
+      // Limpiar los selectores antes de agregar opciones nuevas
+      document.getElementById("source-colA").innerHTML = "";
+      document.getElementById("target-colB").innerHTML = "";
+
+      // Recorrer todos los nodos y agregarlos al selector correcto según su color
+      sankeyData.nodes.forEach((node, index) => {
+        let option = new Option(node.name, index);
+        if (node.color === "#1f77b4") {
+          document.getElementById("source-colA").add(option);
+        } else {
+          document.getElementById("target-colB").add(option);
+        }
+      });
+    }
+
+    // Función para actualizar el gráfico Sankey en la página
+    function updateChart() {
+      // Limpiar el contenedor antes de renderizar el nuevo gráfico
+      document.getElementById("chart-container").innerHTML = "";
+
+      // Llamar a la función que genera el diagrama Sankey (definida en el archivo externo)
+      jocarsaFloralwhite.createSankeyChart({
+        element: "#chart-container", // Elemento HTML donde se renderiza
+        data: sankeyData, // Datos del diagrama
+        width: 800, // Ancho del gráfico
+        height: 500 // Alto del gráfico
+      });
+    }
+
+    // Función para borrar los datos guardados en LocalStorage
+    function clearLocalStorage() {
+      localStorage.removeItem("sankeyData"); // Eliminar los datos almacenados
+      sankeyData = { nodes: [], links: [] }; // Resetear los datos
+      document.getElementById("source-colA").innerHTML = "";
+      document.getElementById("target-colB").innerHTML = "";
+      document.getElementById("chart-container").innerHTML = "";
+      alert("Datos borrados con éxito.");
+    }
+
+    // Cargar datos almacenados cuando la página se cargue
+    window.onload = loadFromLocalStorage;
+  </script>
+</body>
+</html>
+
+
+
+<!-- Agregar nodos: Se ingresan nombres y se agregan a las columnas A y B.
+Agregar enlaces: Se establecen conexiones entre los nodos con valores numéricos.
+Actualizar gráfico: Renderiza el diagrama Sankey con los datos actuales.
+Persistencia de datos: Se guardan nodos y enlaces en localStorage.
+Borrar datos: Se eliminan los nodos y enlaces guardados. -->

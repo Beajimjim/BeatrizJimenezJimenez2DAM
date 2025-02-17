@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de IPs Bloqueadas</title>
+
+    <!-- Carga la librería Chart.js para crear gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Carga la librería Socket.io para la comunicación en tiempo real -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body class="text-center">
+    
+    <!-- Título principal de la página -->
+    <h1>Dashboard de IPs Bloqueadas</h1>
+
+    <!-- Mensaje de advertencia si no hay datos de IPs bloqueadas -->
+    <p id="noDataMessage" style="display: none; color: red;">No hay datos de IPs bloqueadas.</p>
+
+    <!-- Lienzo donde se renderizará el gráfico -->
+    <canvas id="ipChart" width="400" height="200"></canvas>
+
+    <!-- Sección donde se mostrarán las últimas IPs bloqueadas -->
+    <h2>Últimas IPs Bloqueadas</h2>
+    <ul id="blockedIpsList"></ul>
+
+    <script>
+        // Conectar el cliente al servidor a través de WebSockets usando Socket.io
+        const socket = io.connect("http://" + document.domain + ":" + location.port);
+
+        /**
+         * Evento que escucha cuando el servidor envía una nueva IP bloqueada.
+         * Se añade la IP a la lista de IPs bloqueadas en la página y se actualiza el gráfico.
+         */
+        socket.on("new_blocked_ip", function(data) {
+            const blockedIpsList = document.getElementById("blockedIpsList");
+            
+            // Crear un nuevo elemento de lista para la IP bloqueada
+            const newItem = document.createElement("li");
+            newItem.innerHTML = `<strong>Nueva IP Bloqueada:</strong> ${data.ip}`;
+            newItem.style.color = "red"; // Se muestra en rojo para destacar la alerta
+            
+            // Añadir la nueva IP al inicio de la lista
+            blockedIpsList.prepend(newItem);
+
+            // Llamar a la función para actualizar el gráfico en tiempo real
+            updateChart();
+        });
+
+        /**
+         * Función que obtiene las estadísticas de IPs bloqueadas desde el servidor
+         * y actualiza el gráfico en la página.
+         */
+        function updateChart() {
+            fetch("/flask/stats") // Petición a la API del servidor Flask
+                .then(response => response.json()) // Convertir la respuesta en JSON
+                .then(data => {
+                    const labels = Object.keys(data);  // Obtener las IPs como etiquetas
+                    const values = Object.values(data); // Obtener la cantidad de bloqueos por IP
+
+                    // Si no hay datos, mostrar un mensaje de advertencia y ocultar el gráfico
+                    if (labels.length === 0) {
+                        document.getElementById("noDataMessage").style.display = "block";
+                        document.getElementById("ipChart").style.display = "none";
+                        return;
+                    } else {
+                        // Si hay datos, mostrar el gráfico y ocultar el mensaje de advertencia
+                        document.getElementById("noDataMessage").style.display = "none";
+                        document.getElementById("ipChart").style.display = "block";
+                    }
+
+                    // Obtener el contexto del canvas donde se dibujará el gráfico
+                    const ctx = document.getElementById("ipChart").getContext("2d");
+
+                    // Crear un nuevo gráfico de barras con Chart.js
+                    new Chart(ctx, {
+                        type: "bar", // Tipo de gráfico: Barras
+                        data: {
+                            labels: labels, // IPs bloqueadas
+                            datasets: [{
+                                label: "Cantidad de Bloqueos", // Etiqueta de la serie de datos
+                                data: values, // Cantidad de veces que cada IP ha sido bloqueada
+                                backgroundColor: "rgba(255, 99, 132, 0.5)", // Color de fondo de las barras
+                                borderColor: "rgba(255, 99, 132, 1)", // Color del borde de las barras
+                                borderWidth: 1 // Ancho del borde
+                            }]
+                        },
+                        options: {
+                            responsive: true, // Ajustar el tamaño automáticamente
+                            scales: {
+                                y: { beginAtZero: true } // Asegurar que el eje Y comienza en 0
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Llamar a la función para actualizar el gráfico cuando se carga la página
+        updateChart();
+
+        // Configurar una actualización automática cada 10 segundos
+        setInterval(updateChart, 10000);
+    </script>
+
+</body>
+</html>
+
+
+<!-- Explicación de las funcionalidades:
+WebSockets (Socket.io): Permite recibir notificaciones en tiempo real cuando una nueva IP es bloqueada.
+Chart.js: Se usa para crear un gráfico de barras que muestra la cantidad de bloqueos por IP.
+Fetch API: Se usa para obtener los datos del servidor Flask en la ruta /flask/stats y actualizar el gráfico.
+Lista de IPs bloqueadas: Cada vez que el servidor envía una nueva IP bloqueada, se agrega al inicio de la lista en rojo.
+Actualización automática: El gráfico se actualiza cada 10 segundos con datos nuevos. -->
